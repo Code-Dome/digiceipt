@@ -12,7 +12,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Archive, Printer, Download } from "lucide-react";
+import { printReceipt, downloadReceipt, archiveReceipt } from "@/utils/receiptActions";
 
 const View = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -27,7 +28,6 @@ const View = () => {
     setReceipts(savedReceipts);
     setFilteredReceipts(savedReceipts);
 
-    // Focus on newly created receipt if specified
     const focusId = location.state?.focusId;
     if (focusId) {
       const receipt = savedReceipts.find((r: Receipt) => r.id === focusId);
@@ -76,22 +76,72 @@ const View = () => {
     });
   };
 
+  const handleArchive = (receipt: Receipt) => {
+    archiveReceipt(receipt);
+    const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
+    setReceipts(updatedReceipts);
+    setFilteredReceipts(updatedReceipts);
+    toast({
+      title: "Receipt archived",
+      description: `Invoice #${receipt.invoiceNo} has been archived.`,
+    });
+  };
+
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-violet-700">View Receipts</h1>
-        <Button 
-          onClick={() => navigate('/create')}
-          className="bg-violet-600 hover:bg-violet-700"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Invoice
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/archive')}
+            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+          >
+            <Archive className="w-4 h-4 mr-2" />
+            View Archived
+          </Button>
+          <Button 
+            onClick={() => navigate('/create')}
+            className="bg-violet-600 hover:bg-violet-700"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Invoice
+          </Button>
+        </div>
       </div>
       
       <div className="space-y-6">
         <InvoiceFilters onFilterChange={handleFilterChange} />
         
+        {selectedReceipt && (
+          <div className="flex gap-2 mb-4">
+            <Button
+              variant="outline"
+              onClick={() => printReceipt(selectedReceipt)}
+              className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+            >
+              <Printer className="w-4 h-4 mr-2" />
+              Print
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => downloadReceipt(selectedReceipt)}
+              className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleArchive(selectedReceipt)}
+              className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+            >
+              <Archive className="w-4 h-4 mr-2" />
+              Archive
+            </Button>
+          </div>
+        )}
+
         <InvoiceTable
           invoices={filteredReceipts}
           onEdit={setSelectedReceipt}
