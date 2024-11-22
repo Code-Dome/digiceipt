@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { format } from "date-fns-tz";
 import { v4 as uuidv4 } from "uuid";
@@ -14,7 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CustomFieldInput } from "./CustomFieldInput";
+import { SignaturePad } from "./SignaturePad";
 
 interface ReceiptFormProps {
   initialData?: Receipt;
@@ -58,7 +59,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
       type,
       label: "",
       value: "",
-      options: type === "dropdown" ? [""] : undefined,
+      options: type === "dropdown" ? ["Option 1"] : undefined,
     };
     setReceipt((prev) => ({
       ...prev,
@@ -188,97 +189,16 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
 
               <div className="space-y-4">
                 {receipt.customFields.map((field) => (
-                  <div key={field.id} className="grid gap-2">
-                    <Input
-                      placeholder="Field Label"
-                      value={field.label}
-                      onChange={(e) =>
-                        updateCustomField(field.id, { label: e.target.value })
-                      }
-                    />
-                    {field.type === "text" && (
-                      <Input
-                        placeholder="Value"
-                        value={field.value}
-                        onChange={(e) =>
-                          updateCustomField(field.id, { value: e.target.value })
-                        }
-                      />
-                    )}
-                    {field.type === "dropdown" && (
-                      <div className="space-y-2">
-                        <Input
-                          placeholder="Options (comma-separated)"
-                          value={field.options?.join(", ")}
-                          onChange={(e) =>
-                            updateCustomField(field.id, {
-                              options: e.target.value.split(",").map((s) => s.trim()),
-                            })
-                          }
-                        />
-                        <Select
-                          value={field.value}
-                          onValueChange={(value) =>
-                            updateCustomField(field.id, { value })
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select option" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {field.options?.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                    {field.type === "checkbox" && (
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={field.id}
-                          checked={field.value === "true"}
-                          onCheckedChange={(checked) =>
-                            updateCustomField(field.id, {
-                              value: checked ? "true" : "false",
-                            })
-                          }
-                        />
-                        <label
-                          htmlFor={field.id}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {field.label || "Checkbox"}
-                        </label>
-                      </div>
-                    )}
-                  </div>
+                  <CustomFieldInput
+                    key={field.id}
+                    field={field}
+                    onUpdate={updateCustomField}
+                  />
                 ))}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Signature</Label>
-              <div className="border rounded-md p-2">
-                <SignatureCanvas
-                  ref={sigCanvas}
-                  canvasProps={{
-                    className: "signature-pad",
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={clearSignature}
-                  className="mt-2"
-                >
-                  Clear Signature
-                </Button>
-              </div>
-            </div>
+            <SignaturePad sigCanvas={sigCanvas} onClear={clearSignature} />
 
             <Button onClick={handleSave} className="mt-4">
               {initialData?.id ? "Update Receipt" : "Save Receipt"}
