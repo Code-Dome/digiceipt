@@ -8,16 +8,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { Edit, Archive } from "lucide-react";
 import { useMemo } from "react";
+import { archiveReceipt } from "@/utils/receiptActions";
+import { useToast } from "@/components/ui/use-toast";
 
 interface InvoiceTableProps {
   invoices: Receipt[];
   onEdit: (invoice: Receipt) => void;
+  onArchive?: (invoice: Receipt) => void;
 }
 
-export const InvoiceTable = ({ invoices, onEdit }: InvoiceTableProps) => {
-  // Get all unique custom field labels across all invoices
+export const InvoiceTable = ({ invoices, onEdit, onArchive }: InvoiceTableProps) => {
+  const { toast } = useToast();
+  
   const customFieldLabels = useMemo(() => {
     const labels = new Set<string>();
     invoices.forEach(invoice => {
@@ -32,6 +36,17 @@ export const InvoiceTable = ({ invoices, onEdit }: InvoiceTableProps) => {
   const getCustomFieldValue = (invoice: Receipt, label: string) => {
     const field = invoice.customFields.find(f => f.label === label);
     return field?.value || "";
+  };
+
+  const handleArchive = (invoice: Receipt) => {
+    archiveReceipt(invoice);
+    if (onArchive) {
+      onArchive(invoice);
+    }
+    toast({
+      title: "Receipt archived",
+      description: `Invoice #${invoice.invoiceNo} has been archived.`,
+    });
   };
 
   return (
@@ -67,14 +82,24 @@ export const InvoiceTable = ({ invoices, onEdit }: InvoiceTableProps) => {
                 </TableCell>
               ))}
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(invoice)}
-                  className="hover:bg-violet-100"
-                >
-                  <Edit className="h-4 w-4 text-violet-700" />
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(invoice)}
+                    className="hover:bg-violet-100"
+                  >
+                    <Edit className="h-4 w-4 text-violet-700" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleArchive(invoice)}
+                    className="hover:bg-violet-100"
+                  >
+                    <Archive className="h-4 w-4 text-violet-700" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
