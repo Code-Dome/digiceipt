@@ -1,3 +1,5 @@
+import { Receipt } from "@/types/receipt";
+
 export const printReceipt = (receipt: Receipt) => {
   const printWindow = window.open('', '', 'width=300,height=600');
   if (!printWindow) return;
