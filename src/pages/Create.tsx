@@ -20,6 +20,7 @@ const Create = () => {
       description: `Invoice #${receipt.invoiceNo} has been created successfully.`,
     });
     
+    // Navigate to view page and focus on the new receipt
     navigate("/view", { state: { focusId: receipt.id } });
   };
 

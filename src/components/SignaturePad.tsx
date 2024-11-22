@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -6,9 +6,26 @@ import { Label } from "@/components/ui/label";
 interface SignaturePadProps {
   sigCanvas: React.RefObject<SignatureCanvas>;
   onClear: () => void;
+  initialSignature?: string;
 }
 
-export const SignaturePad = ({ sigCanvas, onClear }: SignaturePadProps) => {
+export const SignaturePad = ({ sigCanvas, onClear, initialSignature }: SignaturePadProps) => {
+  useEffect(() => {
+    if (initialSignature && sigCanvas.current) {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = sigCanvas.current;
+        if (canvas) {
+          const ctx = canvas.getCanvas().getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+          }
+        }
+      };
+      img.src = initialSignature;
+    }
+  }, [initialSignature, sigCanvas]);
+
   return (
     <div className="space-y-2">
       <Label>Signature</Label>
@@ -17,6 +34,8 @@ export const SignaturePad = ({ sigCanvas, onClear }: SignaturePadProps) => {
           ref={sigCanvas}
           canvasProps={{
             className: "signature-pad",
+            width: 500,
+            height: 200,
           }}
         />
         <Button

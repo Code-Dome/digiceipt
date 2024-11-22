@@ -8,15 +8,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import ReceiptForm from "@/components/ReceiptForm";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 const View = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [filteredReceipts, setFilteredReceipts] = useState<Receipt[]>([]);
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -75,7 +78,16 @@ const View = () => {
 
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold text-violet-700 mb-8">View Receipts</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-violet-700">View Receipts</h1>
+        <Button 
+          onClick={() => navigate('/create')}
+          className="bg-violet-600 hover:bg-violet-700"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Invoice
+        </Button>
+      </div>
       
       <div className="space-y-6">
         <InvoiceFilters onFilterChange={handleFilterChange} />
@@ -85,8 +97,11 @@ const View = () => {
           onEdit={setSelectedReceipt}
         />
 
-        <Dialog open={!!selectedReceipt} onOpenChange={() => setSelectedReceipt(null)}>
-          <DialogContent className="max-w-4xl">
+        <Dialog 
+          open={!!selectedReceipt} 
+          onOpenChange={(open) => !open && setSelectedReceipt(null)}
+        >
+          <DialogContent className="max-w-[800px] w-[90vw] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Receipt #{selectedReceipt?.invoiceNo}</DialogTitle>
             </DialogHeader>

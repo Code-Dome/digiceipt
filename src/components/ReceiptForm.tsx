@@ -233,7 +233,11 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
               </div>
             </div>
 
-            <SignaturePad sigCanvas={sigCanvas} onClear={() => sigCanvas.current?.clear()} />
+            <SignaturePad 
+              sigCanvas={sigCanvas} 
+              onClear={() => sigCanvas.current?.clear()} 
+              initialSignature={initialData?.signature}
+            />
 
             <Button 
               onClick={handleSave} 
