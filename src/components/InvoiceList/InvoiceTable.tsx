@@ -1,4 +1,4 @@
-import { Receipt, CustomField } from "@/types/receipt";
+import { Receipt } from "@/types/receipt";
 import {
   Table,
   TableBody,
@@ -8,18 +8,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Archive } from "lucide-react";
+import { Edit, Archive, RotateCcw } from "lucide-react";
 import { useMemo } from "react";
-import { archiveReceipt } from "@/utils/receiptActions";
+import { archiveReceipt, unarchiveReceipt } from "@/utils/receiptActions";
 import { useToast } from "@/components/ui/use-toast";
 
 interface InvoiceTableProps {
   invoices: Receipt[];
   onEdit: (invoice: Receipt) => void;
   onArchive?: (invoice: Receipt) => void;
+  onUnarchive?: (invoice: Receipt) => void;
+  isArchivePage?: boolean;
 }
 
-export const InvoiceTable = ({ invoices, onEdit, onArchive }: InvoiceTableProps) => {
+export const InvoiceTable = ({ 
+  invoices, 
+  onEdit, 
+  onArchive, 
+  onUnarchive,
+  isArchivePage = false 
+}: InvoiceTableProps) => {
   const { toast } = useToast();
   
   const customFieldLabels = useMemo(() => {
@@ -32,7 +40,6 @@ export const InvoiceTable = ({ invoices, onEdit, onArchive }: InvoiceTableProps)
     return Array.from(labels);
   }, [invoices]);
 
-  // Helper function to find custom field value
   const getCustomFieldValue = (invoice: Receipt, label: string) => {
     const field = invoice.customFields.find(f => f.label === label);
     return field?.value || "";
@@ -46,6 +53,17 @@ export const InvoiceTable = ({ invoices, onEdit, onArchive }: InvoiceTableProps)
     toast({
       title: "Receipt archived",
       description: `Invoice #${invoice.invoiceNo} has been archived.`,
+    });
+  };
+
+  const handleUnarchive = (invoice: Receipt) => {
+    unarchiveReceipt(invoice);
+    if (onUnarchive) {
+      onUnarchive(invoice);
+    }
+    toast({
+      title: "Receipt unarchived",
+      description: `Invoice #${invoice.invoiceNo} has been unarchived.`,
     });
   };
 
@@ -91,14 +109,25 @@ export const InvoiceTable = ({ invoices, onEdit, onArchive }: InvoiceTableProps)
                   >
                     <Edit className="h-4 w-4 text-violet-700" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleArchive(invoice)}
-                    className="hover:bg-violet-100"
-                  >
-                    <Archive className="h-4 w-4 text-violet-700" />
-                  </Button>
+                  {isArchivePage ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleUnarchive(invoice)}
+                      className="hover:bg-violet-100"
+                    >
+                      <RotateCcw className="h-4 w-4 text-violet-700" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleArchive(invoice)}
+                      className="hover:bg-violet-100"
+                    >
+                      <Archive className="h-4 w-4 text-violet-700" />
+                    </Button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>

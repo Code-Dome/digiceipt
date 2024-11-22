@@ -85,6 +85,9 @@ const View = () => {
       title: "Receipt archived",
       description: `Invoice #${receipt.invoiceNo} has been archived.`,
     });
+    if (selectedReceipt?.id === receipt.id) {
+      setSelectedReceipt(null);
+    }
   };
 
   return (
@@ -145,6 +148,7 @@ const View = () => {
         <InvoiceTable
           invoices={filteredReceipts}
           onEdit={setSelectedReceipt}
+          onArchive={handleArchive}
         />
 
         <Dialog 
