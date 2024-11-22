@@ -71,8 +71,13 @@ export const downloadReceipt = (receipt: Receipt) => {
 
 export const archiveReceipt = (receipt: Receipt) => {
   const archivedReceipts = JSON.parse(localStorage.getItem('archivedReceipts') || '[]');
-  archivedReceipts.push(receipt);
-  localStorage.setItem('archivedReceipts', JSON.stringify(archivedReceipts));
+  // Check if receipt already exists in archived receipts
+  const receiptExists = archivedReceipts.some((r: Receipt) => r.id === receipt.id);
+  
+  if (!receiptExists) {
+    archivedReceipts.push(receipt);
+    localStorage.setItem('archivedReceipts', JSON.stringify(archivedReceipts));
+  }
   
   // Remove from active receipts
   const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]');
