@@ -8,8 +8,23 @@ const Create = () => {
   const { toast } = useToast();
 
   const handleSave = (receipt: Receipt) => {
-    // In a real app, this would be an API call
+    // Check both active and archived receipts for duplicate invoice numbers
     const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
+    const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]");
+    
+    const isDuplicate = [...savedReceipts, ...archivedReceipts].some(
+      (r) => r.invoiceNo === receipt.invoiceNo
+    );
+
+    if (isDuplicate) {
+      toast({
+        title: "Error",
+        description: `Invoice #${receipt.invoiceNo} already exists. Please use a different invoice number.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     localStorage.setItem(
       "receipts",
       JSON.stringify([...savedReceipts, receipt])
@@ -20,7 +35,6 @@ const Create = () => {
       description: `Invoice #${receipt.invoiceNo} has been created successfully.`,
     });
     
-    // Navigate to view page and focus on the new receipt
     navigate("/view", { state: { focusId: receipt.id } });
   };
 

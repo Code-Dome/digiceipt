@@ -18,6 +18,7 @@ import { CustomFieldInput } from "./CustomFieldInput";
 import { SignaturePad } from "./SignaturePad";
 import { DefaultFields } from "./DefaultFields";
 import { RestoreFields } from "./RestoreFields";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ReceiptFormProps {
   initialData?: Receipt;
@@ -31,10 +32,23 @@ const defaultFields = [
   { key: "companyName", label: "Company Name" },
 ];
 
+const generateUniqueInvoiceNo = () => {
+  const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
+  const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]");
+  const allReceipts = [...savedReceipts, ...archivedReceipts];
+  
+  let invoiceNo;
+  do {
+    invoiceNo = `INV-${Math.floor(Math.random() * 10000)}`;
+  } while (allReceipts.some(r => r.invoiceNo === invoiceNo));
+  
+  return invoiceNo;
+};
+
 const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
   const [receipt, setReceipt] = useState<Receipt>(() => ({
     id: initialData?.id || uuidv4(),
-    invoiceNo: initialData?.invoiceNo || `INV-${Math.floor(Math.random() * 10000)}`,
+    invoiceNo: initialData?.invoiceNo || generateUniqueInvoiceNo(),
     timestamp: initialData?.timestamp || format(new Date(), "dd/MM/yyyy HH:mm:ss", { timeZone: "Africa/Johannesburg" }),
     driverName: initialData?.driverName || "",
     horseReg: initialData?.horseReg || "",
