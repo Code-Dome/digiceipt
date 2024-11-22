@@ -2,10 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
+import { Receipt } from "@/types/receipt";
 
 interface DefaultFieldsProps {
   fields: { key: string; label: string }[];
-  values: Record<string, string>;
+  values: Receipt;
   removedFields: string[];
   onInputChange: (field: string, value: string) => void;
   onRemoveField: (field: string) => void;
@@ -38,7 +39,7 @@ export const DefaultFields = ({
               </div>
               <Input
                 id={key}
-                value={values[key] || ""}
+                value={values[key as keyof Receipt] as string || ""}
                 onChange={(e) => onInputChange(key, e.target.value)}
               />
             </div>
