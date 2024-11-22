@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,7 @@ interface CustomFieldInputProps {
 }
 
 export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInputProps) => {
-  // Filter out empty options only when displaying them, not when editing
+  const { toast } = useToast();
   const validOptions = (field.options || []).filter(option => option && option.trim().length > 0);
   
   // Clean up value to only include valid options
@@ -30,6 +31,25 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
   if (cleanValue !== field.value) {
     onUpdate(field.id, { value: cleanValue });
   }
+
+  const handleOptionsChange = (options: string[]) => {
+    // Check for duplicates
+    const trimmedOptions = options.map(opt => opt.trim());
+    const duplicates = trimmedOptions.filter((item, index) => 
+      trimmedOptions.indexOf(item) !== index && item !== ''
+    );
+
+    if (duplicates.length > 0) {
+      toast({
+        variant: "destructive",
+        title: "Duplicate options detected",
+        description: `The option "${duplicates[0]}" already exists.`,
+      });
+      return;
+    }
+
+    onUpdate(field.id, { options });
+  };
 
   return (
     <div className="grid gap-2 p-4 border border-violet-200 rounded-lg bg-violet-50">
@@ -64,7 +84,7 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
         <div className="space-y-2">
           <FieldOptions
             options={field.options || []}
-            onChange={(options) => onUpdate(field.id, { options })}
+            onChange={handleOptionsChange}
           />
           <Select
             value={field.value}
@@ -88,7 +108,7 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
         <div className="space-y-2">
           <FieldOptions
             options={field.options || []}
-            onChange={(options) => onUpdate(field.id, { options })}
+            onChange={handleOptionsChange}
           />
           {validOptions.length > 0 && (
             <div className="space-y-2">
