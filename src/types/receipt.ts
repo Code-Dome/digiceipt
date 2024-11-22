@@ -19,4 +19,5 @@ export interface Receipt {
   otherWashType?: string;
   customFields: CustomField[];
   signature: string;
+  removedFields?: string[];
 }
