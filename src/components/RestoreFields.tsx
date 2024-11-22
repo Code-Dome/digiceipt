@@ -17,7 +17,11 @@ export const RestoreFields = ({
   onRestoreField,
   onRestoreCustomField,
 }: RestoreFieldsProps) => {
-  if (removedFields.length === 0 && removedCustomFields.length === 0) return null;
+  const validRemovedCustomFields = removedCustomFields.filter(
+    (field) => field.label && field.label.trim().length > 0
+  );
+
+  if (removedFields.length === 0 && validRemovedCustomFields.length === 0) return null;
 
   return (
     <div className="flex flex-wrap gap-2 mt-4 p-4 bg-violet-50 rounded-lg border border-violet-200">
@@ -34,20 +38,18 @@ export const RestoreFields = ({
           {defaultFields.find((f) => f.key === field)?.label}
         </Button>
       ))}
-      {removedCustomFields
-        .filter((field) => field.label)
-        .map((field) => (
-          <Button
-            key={field.id}
-            variant="outline"
-            size="sm"
-            onClick={() => onRestoreCustomField(field)}
-            className="bg-white hover:bg-violet-100 text-violet-700 border-violet-200"
-          >
-            <RefreshCw className="h-3 w-3 mr-2" />
-            {field.label} ({field.type})
-          </Button>
-        ))}
+      {validRemovedCustomFields.map((field) => (
+        <Button
+          key={field.id}
+          variant="outline"
+          size="sm"
+          onClick={() => onRestoreCustomField(field)}
+          className="bg-white hover:bg-violet-100 text-violet-700 border-violet-200"
+        >
+          <RefreshCw className="h-3 w-3 mr-2" />
+          {field.label} ({field.type})
+        </Button>
+      ))}
     </div>
   );
 };
