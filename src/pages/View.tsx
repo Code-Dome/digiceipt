@@ -90,6 +90,15 @@ const View = () => {
     }
   };
 
+  const handleDelete = (receipt: Receipt) => {
+    const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
+    setReceipts(updatedReceipts);
+    setFilteredReceipts(updatedReceipts);
+    if (selectedReceipt?.id === receipt.id) {
+      setSelectedReceipt(null);
+    }
+  };
+
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
@@ -149,6 +158,7 @@ const View = () => {
           invoices={filteredReceipts}
           onEdit={setSelectedReceipt}
           onArchive={handleArchive}
+          onDelete={handleDelete}
         />
 
         <Dialog 

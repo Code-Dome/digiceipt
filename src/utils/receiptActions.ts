@@ -91,3 +91,10 @@ export const unarchiveReceipt = (receipt: Receipt) => {
   const updatedArchived = archivedReceipts.filter((r: Receipt) => r.id !== receipt.id);
   localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
 };
+
+export const deleteReceipt = (receipt: Receipt, isArchived: boolean = false) => {
+  const storageKey = isArchived ? 'archivedReceipts' : 'receipts';
+  const existingReceipts = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  const updatedReceipts = existingReceipts.filter((r: Receipt) => r.id !== receipt.id);
+  localStorage.setItem(storageKey, JSON.stringify(updatedReceipts));
+};

@@ -19,6 +19,11 @@ const Archive = () => {
     setArchivedReceipts(updatedReceipts);
   };
 
+  const handleDelete = (receipt: Receipt) => {
+    const updatedReceipts = archivedReceipts.filter(r => r.id !== receipt.id);
+    setArchivedReceipts(updatedReceipts);
+  };
+
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
@@ -39,6 +44,7 @@ const Archive = () => {
         invoices={archivedReceipts}
         onEdit={() => {}}
         onUnarchive={handleUnarchive}
+        onDelete={handleDelete}
         isArchivePage={true}
       />
     </div>

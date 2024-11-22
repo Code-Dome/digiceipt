@@ -8,16 +8,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Archive, RotateCcw } from "lucide-react";
+import { Edit, Archive, RotateCcw, Trash2 } from "lucide-react";
 import { useMemo } from "react";
-import { archiveReceipt, unarchiveReceipt } from "@/utils/receiptActions";
+import { archiveReceipt, unarchiveReceipt, deleteReceipt } from "@/utils/receiptActions";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface InvoiceTableProps {
   invoices: Receipt[];
   onEdit: (invoice: Receipt) => void;
   onArchive?: (invoice: Receipt) => void;
   onUnarchive?: (invoice: Receipt) => void;
+  onDelete?: (invoice: Receipt) => void;
   isArchivePage?: boolean;
 }
 
@@ -26,6 +38,7 @@ export const InvoiceTable = ({
   onEdit, 
   onArchive, 
   onUnarchive,
+  onDelete,
   isArchivePage = false 
 }: InvoiceTableProps) => {
   const { toast } = useToast();
@@ -64,6 +77,17 @@ export const InvoiceTable = ({
     toast({
       title: "Receipt unarchived",
       description: `Invoice #${invoice.invoiceNo} has been unarchived.`,
+    });
+  };
+
+  const handleDelete = (invoice: Receipt) => {
+    deleteReceipt(invoice, isArchivePage);
+    if (onDelete) {
+      onDelete(invoice);
+    }
+    toast({
+      title: "Receipt deleted",
+      description: `Invoice #${invoice.invoiceNo} has been deleted.`,
     });
   };
 
@@ -128,6 +152,34 @@ export const InvoiceTable = ({
                       <Archive className="h-4 w-4 text-violet-700" />
                     </Button>
                   )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-red-100"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-700" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Receipt</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete Invoice #{invoice.invoiceNo}? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(invoice)}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </TableCell>
             </TableRow>
