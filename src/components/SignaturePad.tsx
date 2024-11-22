@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,8 @@ interface SignaturePadProps {
 }
 
 export const SignaturePad = ({ sigCanvas, onClear, initialSignature }: SignaturePadProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (initialSignature && sigCanvas.current) {
       const img = new Image();
@@ -26,16 +28,51 @@ export const SignaturePad = ({ sigCanvas, onClear, initialSignature }: Signature
     }
   }, [initialSignature, sigCanvas]);
 
+  useEffect(() => {
+    const resizeCanvas = () => {
+      if (sigCanvas.current && containerRef.current) {
+        const canvas = sigCanvas.current;
+        const container = containerRef.current;
+        const rect = container.getBoundingClientRect();
+        
+        canvas.getCanvas().width = rect.width;
+        canvas.getCanvas().height = 200;
+        
+        // Clear and redraw if there's an initial signature
+        if (initialSignature) {
+          const img = new Image();
+          img.onload = () => {
+            const ctx = canvas.getCanvas().getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0);
+            }
+          };
+          img.src = initialSignature;
+        }
+      }
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [sigCanvas, initialSignature]);
+
   return (
     <div className="space-y-2">
       <Label>Signature</Label>
-      <div className="border rounded-md p-2">
+      <div ref={containerRef} className="border rounded-md p-2">
         <SignatureCanvas
           ref={sigCanvas}
           canvasProps={{
-            className: "signature-pad",
-            width: 500,
-            height: 200,
+            className: "signature-pad w-full",
+            style: { 
+              width: '100%',
+              height: '200px',
+              backgroundColor: '#fff'
+            }
           }}
         />
         <Button
