@@ -19,7 +19,7 @@ interface CustomFieldInputProps {
 }
 
 export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInputProps) => {
-  // Filter out empty or whitespace-only options
+  // Filter out empty options only when displaying them, not when editing
   const validOptions = (field.options || []).filter(option => option && option.trim().length > 0);
   
   // Clean up value to only include valid options
@@ -84,38 +84,40 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
         </div>
       )}
 
-      {field.type === "checkbox" && validOptions.length > 0 && (
+      {field.type === "checkbox" && (
         <div className="space-y-2">
           <FieldOptions
             options={field.options || []}
             onChange={(options) => onUpdate(field.id, { options })}
           />
-          <div className="space-y-2">
-            {validOptions.map((option) => (
-              <div key={option} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`${field.id}-${option}`}
-                  checked={field.value.split(',').includes(option)}
-                  onCheckedChange={(checked) => {
-                    const values = new Set(field.value.split(',').filter(Boolean));
-                    if (checked) {
-                      values.add(option);
-                    } else {
-                      values.delete(option);
-                    }
-                    onUpdate(field.id, { value: Array.from(values).join(',') });
-                  }}
-                  className="border-violet-200 data-[state=checked]:bg-violet-600"
-                />
-                <label
-                  htmlFor={`${field.id}-${option}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {option}
-                </label>
-              </div>
-            ))}
-          </div>
+          {validOptions.length > 0 && (
+            <div className="space-y-2">
+              {validOptions.map((option) => (
+                <div key={option} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`${field.id}-${option}`}
+                    checked={field.value.split(',').includes(option)}
+                    onCheckedChange={(checked) => {
+                      const values = new Set(field.value.split(',').filter(Boolean));
+                      if (checked) {
+                        values.add(option);
+                      } else {
+                        values.delete(option);
+                      }
+                      onUpdate(field.id, { value: Array.from(values).join(',') });
+                    }}
+                    className="border-violet-200 data-[state=checked]:bg-violet-600"
+                  />
+                  <label
+                    htmlFor={`${field.id}-${option}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {option}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
