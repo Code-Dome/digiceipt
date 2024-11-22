@@ -20,20 +20,22 @@ interface CustomFieldInputProps {
 
 export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInputProps) => {
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-2 p-4 border border-violet-200 rounded-lg bg-violet-50">
       <div className="flex items-center gap-2">
         <Input
           placeholder="Field Label"
           value={field.label}
           onChange={(e) => onUpdate(field.id, { label: e.target.value })}
+          className="bg-white border-violet-200"
         />
         <Button
           type="button"
           variant="outline"
           size="icon"
           onClick={() => onRemove(field.id)}
+          className="hover:bg-destructive/10 border-violet-200"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 text-destructive" />
         </Button>
       </div>
 
@@ -42,6 +44,7 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
           placeholder="Value"
           value={field.value}
           onChange={(e) => onUpdate(field.id, { value: e.target.value })}
+          className="bg-white border-violet-200"
         />
       )}
 
@@ -55,7 +58,7 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
             value={field.value}
             onValueChange={(value) => onUpdate(field.id, { value })}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-white border-violet-200">
               <SelectValue placeholder="Select option" />
             </SelectTrigger>
             <SelectContent>
@@ -93,6 +96,7 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
                       }
                       onUpdate(field.id, { value: Array.from(values).join(',') });
                     }}
+                    className="border-violet-200 data-[state=checked]:bg-violet-600"
                   />
                   <label
                     htmlFor={`${field.id}-${option}`}

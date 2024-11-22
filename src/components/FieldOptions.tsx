@@ -31,14 +31,16 @@ export const FieldOptions = ({ options, onChange }: FieldOptionsProps) => {
             placeholder={`Option ${index + 1}`}
             value={option}
             onChange={(e) => updateOption(index, e.target.value)}
+            className="bg-white border-violet-200"
           />
           <Button
             type="button"
             variant="outline"
             size="icon"
             onClick={() => removeOption(index)}
+            className="hover:bg-destructive/10 border-violet-200"
           >
-            <Minus className="h-4 w-4" />
+            <Minus className="h-4 w-4 text-destructive" />
           </Button>
         </div>
       ))}
@@ -46,7 +48,7 @@ export const FieldOptions = ({ options, onChange }: FieldOptionsProps) => {
         type="button"
         variant="outline"
         onClick={addOption}
-        className="w-full"
+        className="w-full bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
       >
         <Plus className="h-4 w-4 mr-2" /> Add Option
       </Button>

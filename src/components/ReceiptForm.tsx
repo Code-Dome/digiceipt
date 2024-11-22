@@ -6,7 +6,6 @@ import { Receipt, CustomField, FieldType } from "@/types/receipt";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,12 +16,20 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { CustomFieldInput } from "./CustomFieldInput";
 import { SignaturePad } from "./SignaturePad";
+import { DefaultFields } from "./DefaultFields";
+import { RestoreFields } from "./RestoreFields";
 
 interface ReceiptFormProps {
   initialData?: Receipt;
   onSave: (receipt: Receipt) => void;
   onUpdate: (receipt: Receipt) => void;
 }
+
+const defaultFields = [
+  { key: "driverName", label: "Driver Name" },
+  { key: "horseReg", label: "Horse Registration" },
+  { key: "companyName", label: "Company Name" },
+];
 
 const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
   const [receipt, setReceipt] = useState<Receipt>(() => ({
@@ -37,6 +44,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
     customFields: initialData?.customFields || [],
     signature: initialData?.signature || "",
     removedFields: initialData?.removedFields || [],
+    removedCustomFields: initialData?.removedCustomFields || [],
   }));
 
   const sigCanvas = useRef<SignatureCanvas>(null);
@@ -79,10 +87,16 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
   };
 
   const removeCustomField = (id: string) => {
-    setReceipt((prev) => ({
-      ...prev,
-      customFields: prev.customFields.filter((field) => field.id !== id),
-    }));
+    setReceipt((prev) => {
+      const fieldToRemove = prev.customFields.find((field) => field.id === id);
+      if (!fieldToRemove) return prev;
+
+      return {
+        ...prev,
+        customFields: prev.customFields.filter((field) => field.id !== id),
+        removedCustomFields: [...(prev.removedCustomFields || []), fieldToRemove],
+      };
+    });
   };
 
   const removeDefaultField = (field: string) => {
@@ -100,6 +114,16 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
     }));
   };
 
+  const restoreCustomField = (field: CustomField) => {
+    setReceipt((prev) => ({
+      ...prev,
+      customFields: [...prev.customFields, field],
+      removedCustomFields: (prev.removedCustomFields || []).filter(
+        (f) => f.id !== field.id
+      ),
+    }));
+  };
+
   const handleSave = () => {
     if (sigCanvas.current) {
       const signature = sigCanvas.current.toDataURL();
@@ -112,67 +136,33 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
     }
   };
 
-  const clearSignature = () => {
-    if (sigCanvas.current) {
-      sigCanvas.current.clear();
-    }
-  };
-
-  const defaultFields = [
-    { key: "driverName", label: "Driver Name" },
-    { key: "horseReg", label: "Horse Registration" },
-    { key: "companyName", label: "Company Name" },
-  ];
-
   return (
     <Card className="w-full">
       <CardContent className="p-6">
         <div className="space-y-6">
           <div className="flex justify-between">
             <div>
-              <p className="font-semibold">Invoice #{receipt.invoiceNo}</p>
-              <p className="text-sm text-muted-foreground">{receipt.timestamp}</p>
+              <p className="font-semibold text-violet-700">Invoice #{receipt.invoiceNo}</p>
+              <p className="text-sm text-violet-500">{receipt.timestamp}</p>
             </div>
           </div>
 
           <div className="grid gap-4">
-            {defaultFields.map(({ key, label }) => (
-              !(receipt.removedFields || []).includes(key) && (
-                <div key={key} className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor={key}>{label}</Label>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeDefaultField(key)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Input
-                    id={key}
-                    value={receipt[key as keyof Receipt] as string}
-                    onChange={(e) => handleInputChange(key as keyof Receipt, e.target.value)}
-                  />
-                </div>
-              )
-            ))}
+            <DefaultFields
+              fields={defaultFields}
+              values={receipt}
+              removedFields={receipt.removedFields || []}
+              onInputChange={handleInputChange}
+              onRemoveField={removeDefaultField}
+            />
 
-            {(receipt.removedFields || []).length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {receipt.removedFields?.map((field) => (
-                  <Button
-                    key={field}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => restoreDefaultField(field)}
-                  >
-                    Restore {defaultFields.find(f => f.key === field)?.label}
-                  </Button>
-                ))}
-              </div>
-            )}
+            <RestoreFields
+              removedFields={receipt.removedFields || []}
+              removedCustomFields={receipt.removedCustomFields || []}
+              defaultFields={defaultFields}
+              onRestoreField={restoreDefaultField}
+              onRestoreCustomField={restoreCustomField}
+            />
 
             <div className="grid gap-2">
               <Label htmlFor="washType">Wash Type</Label>
@@ -180,7 +170,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
                 value={receipt.washType}
                 onValueChange={handleWashTypeChange}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Select wash type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,6 +199,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
                   type="button"
                   variant="outline"
                   onClick={() => addCustomField("text")}
+                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
                 >
                   Add Text Field
                 </Button>
@@ -216,6 +207,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
                   type="button"
                   variant="outline"
                   onClick={() => addCustomField("dropdown")}
+                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
                 >
                   Add Dropdown
                 </Button>
@@ -223,6 +215,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
                   type="button"
                   variant="outline"
                   onClick={() => addCustomField("checkbox")}
+                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
                 >
                   Add Checkbox
                 </Button>
@@ -240,9 +233,12 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
               </div>
             </div>
 
-            <SignaturePad sigCanvas={sigCanvas} onClear={clearSignature} />
+            <SignaturePad sigCanvas={sigCanvas} onClear={() => sigCanvas.current?.clear()} />
 
-            <Button onClick={handleSave} className="mt-4">
+            <Button 
+              onClick={handleSave} 
+              className="mt-4 bg-violet-600 hover:bg-violet-700 text-white"
+            >
               {initialData?.id ? "Update Receipt" : "Save Receipt"}
             </Button>
           </div>

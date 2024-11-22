@@ -20,4 +20,5 @@ export interface Receipt {
   customFields: CustomField[];
   signature: string;
   removedFields?: string[];
+  removedCustomFields?: CustomField[];
 }
