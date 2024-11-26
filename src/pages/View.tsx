@@ -41,12 +41,14 @@ const View = () => {
   const handleFilterChange = (filters: Record<string, string>) => {
     let filtered = [...receipts];
 
+    // Filter by invoice number
     if (filters.invoiceNo) {
       filtered = filtered.filter((receipt) =>
         receipt.invoiceNo.toLowerCase().includes(filters.invoiceNo.toLowerCase())
       );
     }
 
+    // Filter by date range
     if (filters.dateFrom) {
       filtered = filtered.filter(
         (receipt) => new Date(receipt.timestamp) >= new Date(filters.dateFrom)
@@ -58,6 +60,18 @@ const View = () => {
         (receipt) => new Date(receipt.timestamp) <= new Date(filters.dateTo)
       );
     }
+
+    // Filter by custom fields
+    Object.entries(filters).forEach(([key, value]) => {
+      if (!["invoiceNo", "dateFrom", "dateTo"].includes(key) && value) {
+        filtered = filtered.filter((receipt) => {
+          const customField = receipt.customFields.find(
+            (field) => field.label === key
+          );
+          return customField?.value.toLowerCase().includes(value.toLowerCase());
+        });
+      }
+    });
 
     setFilteredReceipts(filtered);
   };
@@ -126,7 +140,10 @@ const View = () => {
       <div className="space-y-6">
         <CompanySettings />
         
-        <InvoiceFilters onFilterChange={handleFilterChange} />
+        <InvoiceFilters 
+          invoices={receipts}
+          onFilterChange={handleFilterChange} 
+        />
         
         {selectedReceipt && (
           <div className="flex gap-2 mb-4">
