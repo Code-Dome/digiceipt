@@ -8,9 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Archive, RotateCcw, Trash2 } from "lucide-react";
+import { Edit, Archive, RotateCcw, Trash2, Printer, Download } from "lucide-react";
 import { useMemo } from "react";
-import { archiveReceipt, unarchiveReceipt, deleteReceipt } from "@/utils/receiptActions";
+import { archiveReceipt, unarchiveReceipt, deleteReceipt, printReceipt, downloadReceipt } from "@/utils/receiptActions";
 import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
@@ -132,6 +132,22 @@ export const InvoiceTable = ({
                     className="hover:bg-violet-100"
                   >
                     <Edit className="h-4 w-4 text-violet-700" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => printReceipt(invoice)}
+                    className="hover:bg-violet-100"
+                  >
+                    <Printer className="h-4 w-4 text-violet-700" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => downloadReceipt(invoice)}
+                    className="hover:bg-violet-100"
+                  >
+                    <Download className="h-4 w-4 text-violet-700" />
                   </Button>
                   {isArchivePage ? (
                     <Button
