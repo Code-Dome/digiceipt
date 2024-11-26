@@ -63,6 +63,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
 
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [showOtherWashType, setShowOtherWashType] = useState(receipt.washType === "Other");
+  const [hasFieldErrors, setHasFieldErrors] = useState(false);
 
   const handleInputChange = (field: keyof Receipt, value: string) => {
     setReceipt((prev) => ({ ...prev, [field]: value }));
@@ -242,6 +243,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
                     field={field}
                     onUpdate={updateCustomField}
                     onRemove={removeCustomField}
+                    setHasError={setHasFieldErrors}
                   />
                 ))}
               </div>
@@ -256,9 +258,15 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
             <Button 
               onClick={handleSave} 
               className="mt-4 bg-violet-600 hover:bg-violet-700 text-white"
+              disabled={hasFieldErrors}
             >
               {initialData?.id ? "Update Receipt" : "Save Receipt"}
             </Button>
+            {hasFieldErrors && (
+              <p className="text-sm text-destructive mt-2">
+                Please fix the duplicate options in your custom fields before saving.
+              </p>
+            )}
           </div>
         </div>
       </CardContent>

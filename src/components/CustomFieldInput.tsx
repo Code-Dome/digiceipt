@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 import {
   Select,
   SelectContent,
@@ -17,10 +16,10 @@ interface CustomFieldInputProps {
   field: CustomField;
   onUpdate: (id: string, updates: Partial<CustomField>) => void;
   onRemove: (id: string) => void;
+  setHasError: (hasError: boolean) => void;
 }
 
-export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInputProps) => {
-  const { toast } = useToast();
+export const CustomFieldInput = ({ field, onUpdate, onRemove, setHasError }: CustomFieldInputProps) => {
   const validOptions = (field.options || []).filter(option => option && option.trim().length > 0);
   
   // Clean up value to only include valid options
@@ -32,24 +31,14 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
     onUpdate(field.id, { value: cleanValue });
   }
 
-  const handleOptionsChange = (options: string[]) => {
-    // Check for duplicates
-    const trimmedOptions = options.map(opt => opt.trim());
-    const duplicates = trimmedOptions.filter((item, index) => 
-      trimmedOptions.indexOf(item) !== index && item !== ''
-    );
-
-    if (duplicates.length > 0) {
-      toast({
-        variant: "destructive",
-        title: "Duplicate options detected",
-        description: `The option "${duplicates[0]}" already exists.`,
-      });
-      return;
-    }
-
-    onUpdate(field.id, { options });
-  };
+  // Check for duplicates
+  const trimmedOptions = (field.options || []).map(opt => opt.trim());
+  const duplicates = trimmedOptions.filter((item, index) => 
+    trimmedOptions.indexOf(item) !== index && item !== ''
+  );
+  
+  const hasDuplicates = duplicates.length > 0;
+  setHasError(hasDuplicates);
 
   return (
     <div className="grid gap-2 p-4 border border-violet-200 rounded-lg bg-violet-50">
@@ -84,8 +73,13 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
         <div className="space-y-2">
           <FieldOptions
             options={field.options || []}
-            onChange={handleOptionsChange}
+            onChange={(options) => onUpdate(field.id, { options })}
           />
+          {hasDuplicates && (
+            <p className="text-sm text-destructive">
+              Duplicate option detected: "{duplicates[0]}"
+            </p>
+          )}
           <Select
             value={field.value}
             onValueChange={(value) => onUpdate(field.id, { value })}
@@ -108,8 +102,13 @@ export const CustomFieldInput = ({ field, onUpdate, onRemove }: CustomFieldInput
         <div className="space-y-2">
           <FieldOptions
             options={field.options || []}
-            onChange={handleOptionsChange}
+            onChange={(options) => onUpdate(field.id, { options })}
           />
+          {hasDuplicates && (
+            <p className="text-sm text-destructive">
+              Duplicate option detected: "{duplicates[0]}"
+            </p>
+          )}
           {validOptions.length > 0 && (
             <div className="space-y-2">
               {validOptions.map((option) => (
