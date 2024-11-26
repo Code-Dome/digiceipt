@@ -1,11 +1,19 @@
 import { Receipt } from "@/types/receipt";
 
+// Company settings can be stored in localStorage
+const getCompanySettings = () => {
+  const settings = localStorage.getItem('companySettings');
+  return settings ? JSON.parse(settings) : {
+    name: "TruckWash Pro",
+    termsAndConditions: "Terms & Conditions: All services are provided as-is. Payment is due upon completion of service."
+  };
+};
+
 export const printReceipt = (receipt: Receipt) => {
-  const printWindow = window.open('', '_blank', 'width=800,height=600');
+  const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
-  const companyName = "TruckWash Pro"; // You can make this configurable later
-  const termsAndConditions = "Terms & Conditions: All services are provided as-is. Payment is due upon completion of service.";
+  const { name: companyName, termsAndConditions } = getCompanySettings();
 
   const html = `
     <!DOCTYPE html>
@@ -17,12 +25,20 @@ export const printReceipt = (receipt: Receipt) => {
             margin: 0;
             size: A4;
           }
+          @media print {
+            body { -webkit-print-color-adjust: exact; }
+            @page { margin: 0; }
+            @page :footer { display: none }
+            @page :header { display: none }
+          }
           body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 40px auto;
             padding: 40px;
             color: #333;
+            position: relative;
+            background: white;
           }
           .header {
             text-align: center;
@@ -35,21 +51,35 @@ export const printReceipt = (receipt: Receipt) => {
             color: #7E69AB;
             margin: 0;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
           }
           .invoice-details {
             margin: 20px 0;
             padding: 20px;
             background: #f8f8f8;
             border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
           }
           .field {
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+          }
+          .field:last-child {
+            border-bottom: none;
           }
           .field-label {
             font-weight: bold;
             color: #6E59A5;
+            min-width: 150px;
+          }
+          .field-value {
+            text-align: right;
+            flex: 1;
           }
           .signature-section {
             margin-top: 40px;
@@ -59,6 +89,9 @@ export const printReceipt = (receipt: Receipt) => {
           .signature {
             max-width: 300px;
             margin: 20px 0;
+            border: 1px solid #eee;
+            padding: 10px;
+            background: white;
           }
           .footer {
             margin-top: 60px;
@@ -71,40 +104,47 @@ export const printReceipt = (receipt: Receipt) => {
           .terms {
             margin-top: 10px;
             font-style: italic;
+            color: #888;
           }
-          @media print {
-            body { -webkit-print-color-adjust: exact; }
+          .invoice-number {
+            font-size: 18px;
+            color: #7E69AB;
+            margin: 10px 0;
+          }
+          .timestamp {
+            color: #888;
+            font-size: 14px;
           }
         </style>
       </head>
       <body>
         <div class="header">
           <h1 class="company-name">${companyName}</h1>
-          <p>Receipt #${receipt.invoiceNo}</p>
-          <p>${receipt.timestamp}</p>
+          <p class="invoice-number">Receipt #${receipt.invoiceNo}</p>
+          <p class="timestamp">${receipt.timestamp}</p>
         </div>
 
         <div class="invoice-details">
           <div class="field">
             <span class="field-label">Driver:</span>
-            <span>${receipt.driverName}</span>
+            <span class="field-value">${receipt.driverName}</span>
           </div>
           <div class="field">
             <span class="field-label">Horse Registration:</span>
-            <span>${receipt.horseReg}</span>
+            <span class="field-value">${receipt.horseReg}</span>
           </div>
           <div class="field">
             <span class="field-label">Company:</span>
-            <span>${receipt.companyName}</span>
+            <span class="field-value">${receipt.companyName}</span>
           </div>
           <div class="field">
             <span class="field-label">Wash Type:</span>
-            <span>${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}</span>
+            <span class="field-value">${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}</span>
           </div>
           ${receipt.customFields.map(field => `
             <div class="field">
               <span class="field-label">${field.label}:</span>
-              <span>${field.value}</span>
+              <span class="field-value">${field.value}</span>
             </div>
           `).join('')}
         </div>
@@ -122,6 +162,7 @@ export const printReceipt = (receipt: Receipt) => {
         <script>
           window.onload = () => {
             window.print();
+            document.title = '${receipt.invoiceNo}';
           };
         </script>
       </body>

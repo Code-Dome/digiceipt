@@ -14,6 +14,7 @@ import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
 import { Plus, Archive, Printer, Download } from "lucide-react";
 import { printReceipt, downloadReceipt, archiveReceipt } from "@/utils/receiptActions";
+import { CompanySettings } from "@/components/CompanySettings";
 
 const View = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -123,6 +124,8 @@ const View = () => {
       </div>
       
       <div className="space-y-6">
+        <CompanySettings />
+        
         <InvoiceFilters onFilterChange={handleFilterChange} />
         
         {selectedReceipt && (
