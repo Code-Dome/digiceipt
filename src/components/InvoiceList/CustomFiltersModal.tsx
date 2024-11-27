@@ -50,7 +50,7 @@ export const CustomFiltersModal = ({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="btn-outline relative"
+          className="w-full bg-white hover:bg-violet-50 text-violet-700 border-violet-200 relative"
         >
           Custom Filters
           {activeFiltersCount > 0 && (
@@ -77,9 +77,9 @@ export const CustomFiltersModal = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => removeFilter(fieldLabel)}
-                    className="h-6 w-6 hover:bg-primary-light rounded-full"
+                    className="h-6 w-6 hover:bg-violet-50 rounded-full"
                   >
-                    <X className="h-4 w-4 text-primary" />
+                    <X className="h-4 w-4 text-violet-700" />
                   </Button>
                 )}
               </div>
@@ -88,7 +88,7 @@ export const CustomFiltersModal = ({
                 value={localFilters[fieldLabel] || ""}
                 onChange={(e) => handleFilterChange(fieldLabel, e.target.value)}
                 placeholder={`Filter by ${fieldLabel.toLowerCase()}`}
-                className="input-field"
+                className="bg-white border-violet-200"
               />
             </div>
           ))}
