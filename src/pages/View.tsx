@@ -50,14 +50,18 @@ const View = () => {
 
     // Filter by date range
     if (filters.dateFrom) {
+      const fromDate = new Date(filters.dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
       filtered = filtered.filter(
-        (receipt) => new Date(receipt.timestamp) >= new Date(filters.dateFrom)
+        (receipt) => new Date(receipt.timestamp) >= fromDate
       );
     }
 
     if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59, 999);
       filtered = filtered.filter(
-        (receipt) => new Date(receipt.timestamp) <= new Date(filters.dateTo)
+        (receipt) => new Date(receipt.timestamp) <= toDate
       );
     }
 
