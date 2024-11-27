@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Receipt } from "@/types/receipt";
-import { X } from "lucide-react";
+import { CustomFiltersModal } from "./CustomFiltersModal";
 
 interface InvoiceFiltersProps {
   invoices: Receipt[];
@@ -20,7 +19,6 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
   const [availableCustomFields, setAvailableCustomFields] = useState<string[]>([]);
 
   useEffect(() => {
-    // Get unique custom field labels from all invoices
     const customFieldLabels = new Set<string>();
     invoices.forEach(invoice => {
       invoice.customFields.forEach(field => {
@@ -36,22 +34,14 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
     onFilterChange({ ...newFilters, ...customFilters });
   };
 
-  const handleCustomFilterChange = (key: string, value: string) => {
-    const newCustomFilters = { ...customFilters, [key]: value };
-    setCustomFilters(newCustomFilters);
-    onFilterChange({ ...filters, ...newCustomFilters });
-  };
-
-  const removeCustomFilter = (key: string) => {
-    const newCustomFilters = { ...customFilters };
-    delete newCustomFilters[key];
+  const handleCustomFilterChange = (newCustomFilters: Record<string, string>) => {
     setCustomFilters(newCustomFilters);
     onFilterChange({ ...filters, ...newCustomFilters });
   };
 
   return (
     <div className="space-y-4 p-4 bg-violet-50 rounded-lg border border-violet-200">
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         <div className="space-y-2">
           <Label htmlFor="invoiceNo">Invoice Number</Label>
           <Input
@@ -82,40 +72,15 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
             className="bg-white border-violet-200"
           />
         </div>
-      </div>
-
-      {availableCustomFields.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-sm font-medium text-violet-900 mb-3">Custom Fields</h3>
-          <div className="grid gap-4 md:grid-cols-3">
-            {availableCustomFields.map((fieldLabel) => (
-              <div key={fieldLabel} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor={`custom-${fieldLabel}`}>{fieldLabel}</Label>
-                  {customFilters[fieldLabel] && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeCustomFilter(fieldLabel)}
-                      className="h-6 w-6 hover:bg-violet-100"
-                    >
-                      <X className="h-4 w-4 text-violet-700" />
-                    </Button>
-                  )}
-                </div>
-                <Input
-                  id={`custom-${fieldLabel}`}
-                  value={customFilters[fieldLabel] || ""}
-                  onChange={(e) => handleCustomFilterChange(fieldLabel, e.target.value)}
-                  placeholder={`Filter by ${fieldLabel.toLowerCase()}`}
-                  className="bg-white border-violet-200"
-                />
-              </div>
-            ))}
-          </div>
+        <div className="space-y-2">
+          <Label>Custom Fields</Label>
+          <CustomFiltersModal
+            availableCustomFields={availableCustomFields}
+            customFilters={customFilters}
+            onFilterChange={handleCustomFilterChange}
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 };
