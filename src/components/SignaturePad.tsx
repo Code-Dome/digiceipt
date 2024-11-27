@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 
 interface SignaturePadProps {
   sigCanvas: React.RefObject<SignatureCanvas>;
@@ -38,7 +39,6 @@ export const SignaturePad = ({ sigCanvas, onClear, initialSignature }: Signature
         canvas.getCanvas().width = rect.width;
         canvas.getCanvas().height = 200;
         
-        // Clear and redraw if there's an initial signature
         if (initialSignature) {
           const img = new Image();
           img.onload = () => {
@@ -61,30 +61,32 @@ export const SignaturePad = ({ sigCanvas, onClear, initialSignature }: Signature
   }, [sigCanvas, initialSignature]);
 
   return (
-    <div className="space-y-2">
-      <Label>Signature</Label>
-      <div ref={containerRef} className="border rounded-md p-2">
-        <SignatureCanvas
-          ref={sigCanvas}
-          canvasProps={{
-            className: "signature-pad w-full",
-            style: { 
-              width: '100%',
-              height: '200px',
-              backgroundColor: '#fff'
-            }
-          }}
-        />
+    <div className="space-y-3">
+      <Label className="text-sm font-medium text-gray-700">Signature</Label>
+      <Card className="p-4 bg-white shadow-sm hover:shadow transition-shadow duration-200">
+        <div ref={containerRef} className="border rounded-lg border-gray-200 p-2 bg-white">
+          <SignatureCanvas
+            ref={sigCanvas}
+            canvasProps={{
+              className: "signature-pad w-full",
+              style: { 
+                width: '100%',
+                height: '200px',
+                backgroundColor: '#fff'
+              }
+            }}
+          />
+        </div>
         <Button
           type="button"
           variant="outline"
           size="sm"
           onClick={onClear}
-          className="mt-2"
+          className="mt-3 btn-outline"
         >
           Clear Signature
         </Button>
-      </div>
+      </Card>
     </div>
   );
 };

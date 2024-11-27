@@ -50,29 +50,36 @@ export const CustomFiltersModal = ({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+          className="btn-outline relative"
         >
-          Custom Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}
+          Custom Filters
+          {activeFiltersCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+              {activeFiltersCount}
+            </span>
+          )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[600px]">
+      <DialogContent className="max-w-[600px] p-6">
         <DialogHeader>
-          <DialogTitle>Custom Filters</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-900 mb-4">Custom Filters</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4">
+        <div className="grid gap-6">
           {availableCustomFields.map((fieldLabel) => (
             <div key={fieldLabel} className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor={`custom-${fieldLabel}`}>{fieldLabel}</Label>
+                <Label htmlFor={`custom-${fieldLabel}`} className="text-sm font-medium text-gray-700">
+                  {fieldLabel}
+                </Label>
                 {localFilters[fieldLabel] && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     onClick={() => removeFilter(fieldLabel)}
-                    className="h-6 w-6 hover:bg-violet-100"
+                    className="h-6 w-6 hover:bg-primary-light rounded-full"
                   >
-                    <X className="h-4 w-4 text-violet-700" />
+                    <X className="h-4 w-4 text-primary" />
                   </Button>
                 )}
               </div>
@@ -81,7 +88,7 @@ export const CustomFiltersModal = ({
                 value={localFilters[fieldLabel] || ""}
                 onChange={(e) => handleFilterChange(fieldLabel, e.target.value)}
                 placeholder={`Filter by ${fieldLabel.toLowerCase()}`}
-                className="bg-white border-violet-200"
+                className="input-field"
               />
             </div>
           ))}
