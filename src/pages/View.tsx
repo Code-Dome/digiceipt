@@ -13,7 +13,11 @@ import { useToast } from "@/components/ui/use-toast";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
 import { Plus, Archive, Printer, Download, Home } from "lucide-react";
-import { printReceipt, downloadReceipt, archiveReceipt } from "@/utils/receiptActions";
+import { 
+  printReceipt, 
+  downloadReceipt, 
+  archiveReceipt 
+} from "@/utils/receiptActions";
 import { CompanySettings } from "@/components/CompanySettings";
 
 const View = () => {

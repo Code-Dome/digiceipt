@@ -72,6 +72,23 @@ const createReceiptHTML = (receipt: Receipt, settings: any) => {
   `;
 };
 
+export const printReceipt = async (receipt: Receipt) => {
+  const settings = getCompanySettings();
+  const html = createReceiptHTML(receipt, settings);
+  
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.close();
+  }
+};
+
+export const downloadReceipt = async (receipt: Receipt) => {
+  return downloadReceiptAsA6(receipt);
+};
+
 export const downloadReceiptAsA6 = async (receipt: Receipt) => {
   const settings = getCompanySettings();
   const html = createReceiptHTML(receipt, settings);

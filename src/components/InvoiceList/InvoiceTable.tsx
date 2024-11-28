@@ -10,7 +10,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit, Archive, RotateCcw, Trash2, Printer, Download } from "lucide-react";
 import { useMemo } from "react";
-import { archiveReceipt, unarchiveReceipt, deleteReceipt, printReceipt, downloadReceipt } from "@/utils/receiptActions";
+import { 
+  archiveReceipt, 
+  unarchiveReceipt, 
+  deleteReceipt, 
+  printReceipt, 
+  downloadReceipt 
+} from "@/utils/receiptActions";
 import { useToast } from "@/components/ui/use-toast";
 import {
   AlertDialog,
