@@ -1,6 +1,6 @@
 import { Receipt } from "@/types/receipt";
+import html2canvas from "html2canvas";
 
-// Company settings can be stored in localStorage
 const getCompanySettings = () => {
   const settings = localStorage.getItem('companySettings');
   return settings ? JSON.parse(settings) : {
@@ -9,171 +9,94 @@ const getCompanySettings = () => {
   };
 };
 
-export const printReceipt = (receipt: Receipt) => {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return;
-
-  const { name: companyName, termsAndConditions } = getCompanySettings();
-
-  const html = `
+const createReceiptHTML = (receipt: Receipt, settings: any) => {
+  return `
     <!DOCTYPE html>
     <html>
       <head>
         <title>Receipt #${receipt.invoiceNo}</title>
         <style>
-          @page {
-            margin: 0;
-            size: A4;
-          }
-          @media print {
-            body { -webkit-print-color-adjust: exact; }
-            @page { margin: 0; }
-            @page :footer { display: none }
-            @page :header { display: none }
-          }
+          @page { size: 105mm 148mm; margin: 0; }
           body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 40px;
+            padding: 10mm;
+            max-width: 85mm;
+            margin: 0 auto;
             color: #333;
-            position: relative;
-            background: white;
           }
-          .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #9b87f5;
-            padding-bottom: 20px;
-          }
-          .company-name {
-            font-size: 32px;
-            color: #7E69AB;
-            margin: 0;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-          }
-          .invoice-details {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f8f8;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-          }
-          .field {
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-          }
-          .field:last-child {
-            border-bottom: none;
-          }
-          .field-label {
-            font-weight: bold;
-            color: #6E59A5;
-            min-width: 150px;
-          }
-          .field-value {
-            text-align: right;
-            flex: 1;
-          }
-          .signature-section {
-            margin-top: 40px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-          }
-          .signature {
-            max-width: 300px;
-            margin: 20px 0;
-            border: 1px solid #eee;
-            padding: 10px;
-            background: white;
-          }
-          .footer {
-            margin-top: 60px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-          }
-          .terms {
-            margin-top: 10px;
-            font-style: italic;
-            color: #888;
-          }
-          .invoice-number {
-            font-size: 18px;
-            color: #7E69AB;
-            margin: 10px 0;
-          }
-          .timestamp {
-            color: #888;
-            font-size: 14px;
-          }
+          .header { text-align: center; margin-bottom: 5mm; }
+          .company-name { font-size: 14pt; margin: 0; color: #7E69AB; }
+          .invoice-number { font-size: 12pt; margin: 2mm 0; color: #7E69AB; }
+          .timestamp { font-size: 10pt; color: #888; }
+          .details { margin: 5mm 0; }
+          .field { margin: 2mm 0; }
+          .field-label { font-weight: bold; color: #6E59A5; }
+          .signature { margin-top: 5mm; border-top: 1px solid #eee; padding-top: 5mm; }
+          .footer { margin-top: 5mm; font-size: 8pt; text-align: center; color: #888; }
         </style>
       </head>
       <body>
         <div class="header">
-          <h1 class="company-name">${companyName}</h1>
+          <h1 class="company-name">${settings.name}</h1>
           <p class="invoice-number">Receipt #${receipt.invoiceNo}</p>
           <p class="timestamp">${receipt.timestamp}</p>
         </div>
-
-        <div class="invoice-details">
+        <div class="details">
           <div class="field">
-            <span class="field-label">Driver:</span>
-            <span class="field-value">${receipt.driverName}</span>
+            <span class="field-label">Driver:</span> ${receipt.driverName}
           </div>
           <div class="field">
-            <span class="field-label">Horse Registration:</span>
-            <span class="field-value">${receipt.horseReg}</span>
+            <span class="field-label">Horse Reg:</span> ${receipt.horseReg}
           </div>
           <div class="field">
-            <span class="field-label">Company:</span>
-            <span class="field-value">${receipt.companyName}</span>
+            <span class="field-label">Company:</span> ${receipt.companyName}
           </div>
           <div class="field">
-            <span class="field-label">Wash Type:</span>
-            <span class="field-value">${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}</span>
+            <span class="field-label">Wash Type:</span> ${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}
           </div>
           ${receipt.customFields.map(field => `
             <div class="field">
-              <span class="field-label">${field.label}:</span>
-              <span class="field-value">${field.value}</span>
+              <span class="field-label">${field.label}:</span> ${field.value}
             </div>
           `).join('')}
         </div>
-
-        <div class="signature-section">
-          <p class="field-label">Signature:</p>
-          <img src="${receipt.signature}" alt="Signature" class="signature" />
+        <div class="signature">
+          <span class="field-label">Signature:</span><br>
+          <img src="${receipt.signature}" alt="Signature" style="max-width: 100%; margin-top: 2mm;">
         </div>
-
         <div class="footer">
-          <div>${companyName}</div>
-          <div class="terms">${termsAndConditions}</div>
+          ${settings.termsAndConditions}
         </div>
-
-        <script>
-          window.onload = () => {
-            window.print();
-            document.title = '${receipt.invoiceNo}';
-          };
-        </script>
       </body>
     </html>
   `;
-
-  printWindow.document.write(html);
-  printWindow.document.close();
 };
 
-export const downloadReceipt = (receipt: Receipt) => {
+export const downloadReceiptAsA6 = async (receipt: Receipt) => {
+  const settings = getCompanySettings();
+  const html = createReceiptHTML(receipt, settings);
+  
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  document.body.appendChild(container);
+  
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      width: 396, // A6 width in pixels at 96 DPI
+      height: 559, // A6 height in pixels at 96 DPI
+    });
+    
+    const link = document.createElement('a');
+    link.download = `receipt-${receipt.invoiceNo}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } finally {
+    document.body.removeChild(container);
+  }
+};
+
+export const downloadReceiptAsJson = (receipt: Receipt) => {
   const data = JSON.stringify(receipt, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);

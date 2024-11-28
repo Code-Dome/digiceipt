@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Receipt } from "@/types/receipt";
 import { CustomFiltersModal } from "./CustomFiltersModal";
 import { X } from "lucide-react";
+import { format, parse } from "date-fns";
 
 interface InvoiceFiltersProps {
   invoices: Receipt[];
@@ -33,7 +34,17 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    onFilterChange({ ...newFilters, ...customFilters });
+    
+    // Convert dates to the format used in receipts for comparison
+    const formattedFilters = {
+      ...newFilters,
+      dateFrom: newFilters.dateFrom ? 
+        format(parse(newFilters.dateFrom, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy') : '',
+      dateTo: newFilters.dateTo ? 
+        format(parse(newFilters.dateTo, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy') : '',
+    };
+    
+    onFilterChange({ ...formattedFilters, ...customFilters });
   };
 
   const handleCustomFilterChange = (newCustomFilters: Record<string, string>) => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Receipt } from "@/types/receipt";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 
 export const WashingStats = () => {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
@@ -13,10 +13,17 @@ export const WashingStats = () => {
     
     // Process monthly data
     const monthlyStats = receipts.reduce((acc: Record<string, number>, receipt) => {
-      const date = new Date(receipt.timestamp);
-      if (!isNaN(date.getTime())) { // Check if date is valid
-        const monthYear = format(date, 'MMM yyyy');
-        acc[monthYear] = (acc[monthYear] || 0) + 1;
+      try {
+        // Parse the date from dd/MM/yyyy format
+        const [day, month, year] = receipt.timestamp.split('/');
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        
+        if (!isNaN(date.getTime())) {
+          const monthYear = format(date, 'MMM yyyy');
+          acc[monthYear] = (acc[monthYear] || 0) + 1;
+        }
+      } catch (error) {
+        console.error('Error processing date:', receipt.timestamp);
       }
       return acc;
     }, {});
@@ -27,21 +34,23 @@ export const WashingStats = () => {
         count,
       }))
       .sort((a, b) => {
-        const dateA = new Date(a.month);
-        const dateB = new Date(b.month);
-        return dateA.getTime() - dateB.getTime();
+        const parseMonth = (str: string) => parse(str, 'MMM yyyy', new Date());
+        return parseMonth(a.month).getTime() - parseMonth(b.month).getTime();
       });
 
     // Process wash type data
     const washTypeStats = receipts.reduce((acc: Record<string, number>, receipt) => {
-      acc[receipt.washType] = (acc[receipt.washType] || 0) + 1;
+      const type = receipt.washType || 'Unknown';
+      acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
 
-    const washTypeChartData = Object.entries(washTypeStats).map(([type, count]) => ({
-      type,
-      count,
-    }));
+    const washTypeChartData = Object.entries(washTypeStats)
+      .map(([type, count]) => ({
+        type: type || 'Unknown',
+        count,
+      }))
+      .sort((a, b) => b.count - a.count);
 
     setMonthlyData(monthlyChartData);
     setWashTypeData(washTypeChartData);
