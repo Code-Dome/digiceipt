@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Archive, Printer, Download } from "lucide-react";
+import { Plus, Archive, Printer, Download, Home } from "lucide-react";
 import { printReceipt, downloadReceipt, archiveReceipt } from "@/utils/receiptActions";
 import { CompanySettings } from "@/components/CompanySettings";
 
@@ -123,7 +123,17 @@ const View = () => {
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-violet-700">View Receipts</h1>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/')}
+            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Dashboard
+          </Button>
+          <h1 className="text-3xl font-bold text-violet-700">View Receipts</h1>
+        </div>
         <div className="flex gap-2">
           <Button 
             variant="outline"

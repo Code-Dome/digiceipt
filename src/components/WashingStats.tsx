@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Receipt } from "@/types/receipt";
+import { format } from "date-fns";
 
 export const WashingStats = () => {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
@@ -13,15 +14,23 @@ export const WashingStats = () => {
     // Process monthly data
     const monthlyStats = receipts.reduce((acc: Record<string, number>, receipt) => {
       const date = new Date(receipt.timestamp);
-      const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
-      acc[monthYear] = (acc[monthYear] || 0) + 1;
+      if (!isNaN(date.getTime())) { // Check if date is valid
+        const monthYear = format(date, 'MMM yyyy');
+        acc[monthYear] = (acc[monthYear] || 0) + 1;
+      }
       return acc;
     }, {});
 
-    const monthlyChartData = Object.entries(monthlyStats).map(([month, count]) => ({
-      month,
-      count,
-    }));
+    const monthlyChartData = Object.entries(monthlyStats)
+      .map(([month, count]) => ({
+        month,
+        count,
+      }))
+      .sort((a, b) => {
+        const dateA = new Date(a.month);
+        const dateB = new Date(b.month);
+        return dateA.getTime() - dateB.getTime();
+      });
 
     // Process wash type data
     const washTypeStats = receipts.reduce((acc: Record<string, number>, receipt) => {
