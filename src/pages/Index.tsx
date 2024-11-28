@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, FileText, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { WashingStats } from "@/components/WashingStats";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Index = () => {
         </div>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
         <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
           <h2 className="text-xl font-semibold text-violet-700 mb-4">Create Receipt</h2>
           <p className="text-gray-600 mb-4">Generate a new digital receipt with custom fields and signature.</p>
@@ -45,6 +46,8 @@ const Index = () => {
           </Button>
         </div>
       </div>
+
+      <WashingStats />
     </div>
   );
 };

@@ -1,0 +1,78 @@
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Receipt } from "@/types/receipt";
+
+export const WashingStats = () => {
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [washTypeData, setWashTypeData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const receipts: Receipt[] = JSON.parse(localStorage.getItem("receipts") || "[]");
+    
+    // Process monthly data
+    const monthlyStats = receipts.reduce((acc: Record<string, number>, receipt) => {
+      const date = new Date(receipt.timestamp);
+      const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+      acc[monthYear] = (acc[monthYear] || 0) + 1;
+      return acc;
+    }, {});
+
+    const monthlyChartData = Object.entries(monthlyStats).map(([month, count]) => ({
+      month,
+      count,
+    }));
+
+    // Process wash type data
+    const washTypeStats = receipts.reduce((acc: Record<string, number>, receipt) => {
+      acc[receipt.washType] = (acc[receipt.washType] || 0) + 1;
+      return acc;
+    }, {});
+
+    const washTypeChartData = Object.entries(washTypeStats).map(([type, count]) => ({
+      type,
+      count,
+    }));
+
+    setMonthlyData(monthlyChartData);
+    setWashTypeData(washTypeChartData);
+  }, []);
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle>Monthly Washing Statistics</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthlyData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#8b5cf6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Wash Types Distribution</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={washTypeData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="type" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#8b5cf6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};

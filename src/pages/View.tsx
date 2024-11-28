@@ -52,17 +52,19 @@ const View = () => {
     if (filters.dateFrom) {
       const fromDate = new Date(filters.dateFrom);
       fromDate.setHours(0, 0, 0, 0);
-      filtered = filtered.filter(
-        (receipt) => new Date(receipt.timestamp) >= fromDate
-      );
+      filtered = filtered.filter((receipt) => {
+        const receiptDate = new Date(receipt.timestamp);
+        return receiptDate >= fromDate;
+      });
     }
 
     if (filters.dateTo) {
       const toDate = new Date(filters.dateTo);
       toDate.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(
-        (receipt) => new Date(receipt.timestamp) <= toDate
-      );
+      filtered = filtered.filter((receipt) => {
+        const receiptDate = new Date(receipt.timestamp);
+        return receiptDate <= toDate;
+      });
     }
 
     // Filter by custom fields
