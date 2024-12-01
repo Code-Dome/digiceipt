@@ -4,11 +4,13 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { useToast } from "./ui/use-toast";
+import { CompanySettings as CompanySettingsType } from "@/types/companySettings";
 
 export const CompanySettings = () => {
   const { toast } = useToast();
-  const [settings, setSettings] = useState({
-    name: "",
+  const [settings, setSettings] = useState<CompanySettingsType>({
+    companyName: "",
+    address: "",
     termsAndConditions: ""
   });
 
@@ -33,12 +35,22 @@ export const CompanySettings = () => {
         <Label htmlFor="companyName">Company Name</Label>
         <Input
           id="companyName"
-          value={settings.name}
-          onChange={(e) => setSettings(prev => ({ ...prev, name: e.target.value }))}
+          value={settings.companyName}
+          onChange={(e) => setSettings(prev => ({ ...prev, companyName: e.target.value }))}
           placeholder="Enter company name"
         />
       </div>
       
+      <div className="space-y-2">
+        <Label htmlFor="address">Address</Label>
+        <Input
+          id="address"
+          value={settings.address}
+          onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
+          placeholder="Enter company address"
+        />
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="termsAndConditions">Terms & Conditions</Label>
         <Textarea
