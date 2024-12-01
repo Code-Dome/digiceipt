@@ -3,6 +3,7 @@ import { Plus, FileText, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { WashingStats } from "@/components/WashingStats";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -12,7 +13,8 @@ const Index = () => {
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-violet-700">Digital Receipts</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <ThemeSwitcher />
           <Button 
             onClick={() => logout()}
             variant="outline"
@@ -24,9 +26,9 @@ const Index = () => {
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
-        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-          <h2 className="text-xl font-semibold text-violet-700 mb-4">Create Receipt</h2>
-          <p className="text-gray-600 mb-4">Generate a new digital receipt with custom fields and signature.</p>
+        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">Create Receipt</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">Generate a new digital receipt with custom fields and signature.</p>
           <Button 
             onClick={() => navigate("/create")}
             className="w-full bg-violet-600 hover:bg-violet-700"
@@ -35,9 +37,9 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-          <h2 className="text-xl font-semibold text-violet-700 mb-4">View Receipts</h2>
-          <p className="text-gray-600 mb-4">Access and manage all your created digital receipts.</p>
+        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">View Receipts</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">Access and manage all your created digital receipts.</p>
           <Button 
             onClick={() => navigate("/view")}
             className="w-full bg-violet-600 hover:bg-violet-700"
