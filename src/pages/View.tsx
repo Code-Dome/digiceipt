@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Archive, Printer, Download, Home } from "lucide-react";
+import { Plus, Archive, Printer, Download, Home, FileText } from "lucide-react";
 import { 
   printReceipt, 
   downloadReceipt, 
@@ -190,6 +190,14 @@ const View = () => {
             >
               <Archive className="w-4 h-4 mr-2" />
               Archive
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/templates', { state: { receipt: selectedReceipt } })}
+              className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Choose Template
             </Button>
           </div>
         )}

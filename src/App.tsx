@@ -11,6 +11,7 @@ import Create from "./pages/Create";
 import View from "./pages/View";
 import Archive from "./pages/Archive";
 import Login from "./pages/Login";
+import Templates from "./pages/Templates";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Archive />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/templates"
+                element={
+                  <ProtectedRoute>
+                    <Templates />
                   </ProtectedRoute>
                 }
               />
