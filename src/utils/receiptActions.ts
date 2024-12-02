@@ -8,12 +8,8 @@ const getReceiptHTML = (receipt: Receipt) => {
   const templateId = localStorage.getItem(`template_${receipt.id}`) || 
                     localStorage.getItem('defaultTemplate') || 
                     'modern-minimal';
+  
   const template = getTemplateById(templateId);
-  
-  if (!template) {
-    throw new Error('Template not found');
-  }
-  
   return template.generateHTML(receipt, settings);
 };
 

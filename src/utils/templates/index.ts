@@ -7,6 +7,11 @@ export const receiptTemplates: TemplateStyle[] = [
   ...softTemplates
 ];
 
-export const getTemplateById = (templateId: string): TemplateStyle | undefined => {
-  return receiptTemplates.find(template => template.id === templateId);
+export const getTemplateById = (templateId: string): TemplateStyle => {
+  const template = receiptTemplates.find(t => t.id === templateId);
+  if (!template) {
+    // Return default template if none found
+    return receiptTemplates[0];
+  }
+  return template;
 };
