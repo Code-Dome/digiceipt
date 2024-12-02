@@ -38,6 +38,17 @@ const Index = () => {
         </div>
 
         <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">Customize Templates</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">Preview and select different receipt templates for your business.</p>
+          <Button 
+            onClick={() => navigate("/templates")}
+            className="w-full bg-violet-600 hover:bg-violet-700"
+          >
+            <FileText className="mr-2 h-4 w-4" /> Manage Templates
+          </Button>
+        </div>
+
+        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">View Receipts</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">Access and manage all your created digital receipts.</p>
           <Button 

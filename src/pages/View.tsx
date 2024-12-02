@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Receipt } from "@/types/receipt";
 import { InvoiceFilters } from "@/components/InvoiceList/InvoiceFilters";
 import { InvoiceTable } from "@/components/InvoiceList/InvoiceTable";
@@ -8,120 +8,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
 import { Plus, Archive, Printer, Download, Home, FileText } from "lucide-react";
-import { 
-  printReceipt, 
-  downloadReceipt, 
-  archiveReceipt 
-} from "@/utils/receiptActions";
 import { CompanySettings } from "@/components/CompanySettings";
+import { useReceipts } from "@/hooks/useReceipts";
+import { useReceiptActions } from "@/hooks/useReceiptActions";
 
 const View = () => {
-  const [receipts, setReceipts] = useState<Receipt[]>([]);
-  const [filteredReceipts, setFilteredReceipts] = useState<Receipt[]>([]);
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
-  const location = useLocation();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
-    setReceipts(savedReceipts);
-    setFilteredReceipts(savedReceipts);
-
-    const focusId = location.state?.focusId;
-    if (focusId) {
-      const receipt = savedReceipts.find((r: Receipt) => r.id === focusId);
-      if (receipt) {
-        setSelectedReceipt(receipt);
-      }
-    }
-  }, [location.state?.focusId]);
-
-  const handleFilterChange = (filters: Record<string, string>) => {
-    let filtered = [...receipts];
-
-    // Filter by invoice number
-    if (filters.invoiceNo) {
-      filtered = filtered.filter((receipt) =>
-        receipt.invoiceNo.toLowerCase().includes(filters.invoiceNo.toLowerCase())
-      );
-    }
-
-    // Filter by date range
-    if (filters.dateFrom) {
-      const fromDate = new Date(filters.dateFrom);
-      fromDate.setHours(0, 0, 0, 0);
-      filtered = filtered.filter((receipt) => {
-        const receiptDate = new Date(receipt.timestamp);
-        return receiptDate >= fromDate;
-      });
-    }
-
-    if (filters.dateTo) {
-      const toDate = new Date(filters.dateTo);
-      toDate.setHours(23, 59, 59, 999);
-      filtered = filtered.filter((receipt) => {
-        const receiptDate = new Date(receipt.timestamp);
-        return receiptDate <= toDate;
-      });
-    }
-
-    // Filter by custom fields
-    Object.entries(filters).forEach(([key, value]) => {
-      if (!["invoiceNo", "dateFrom", "dateTo"].includes(key) && value) {
-        filtered = filtered.filter((receipt) => {
-          const customField = receipt.customFields.find(
-            (field) => field.label === key
-          );
-          return customField?.value.toLowerCase().includes(value.toLowerCase());
-        });
-      }
-    });
-
-    setFilteredReceipts(filtered);
-  };
+  const { 
+    filteredReceipts, 
+    handleArchive, 
+    handleDelete, 
+    handleFilterChange 
+  } = useReceipts();
+  const { printReceipt, downloadReceipt, navigateToTemplates } = useReceiptActions();
 
   const handleUpdate = (updatedReceipt: Receipt) => {
-    const updatedReceipts = receipts.map((receipt) =>
+    const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
+    const updatedReceipts = savedReceipts.map((receipt: Receipt) =>
       receipt.id === updatedReceipt.id ? updatedReceipt : receipt
     );
     localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
-    setReceipts(updatedReceipts);
-    setFilteredReceipts(updatedReceipts);
     setSelectedReceipt(null);
-    
-    toast({
-      title: "Receipt updated",
-      description: `Invoice #${updatedReceipt.invoiceNo} has been updated successfully.`,
-    });
-  };
-
-  const handleArchive = (receipt: Receipt) => {
-    archiveReceipt(receipt);
-    const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
-    setReceipts(updatedReceipts);
-    setFilteredReceipts(updatedReceipts);
-    toast({
-      title: "Receipt archived",
-      description: `Invoice #${receipt.invoiceNo} has been archived.`,
-    });
-    if (selectedReceipt?.id === receipt.id) {
-      setSelectedReceipt(null);
-    }
-  };
-
-  const handleDelete = (receipt: Receipt) => {
-    const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
-    setReceipts(updatedReceipts);
-    setFilteredReceipts(updatedReceipts);
-    if (selectedReceipt?.id === receipt.id) {
-      setSelectedReceipt(null);
-    }
   };
 
   return (
@@ -140,14 +52,6 @@ const View = () => {
         </div>
         <div className="flex gap-2">
           <Button 
-            variant="outline"
-            onClick={() => navigate('/archive')}
-            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
-          >
-            <Archive className="w-4 h-4 mr-2" />
-            View Archived
-          </Button>
-          <Button 
             onClick={() => navigate('/create')}
             className="bg-violet-600 hover:bg-violet-700"
           >
@@ -161,7 +65,7 @@ const View = () => {
         <CompanySettings />
         
         <InvoiceFilters 
-          invoices={receipts}
+          invoices={filteredReceipts}
           onFilterChange={handleFilterChange} 
         />
         
@@ -193,7 +97,7 @@ const View = () => {
             </Button>
             <Button
               variant="outline"
-              onClick={() => navigate('/templates', { state: { receipt: selectedReceipt } })}
+              onClick={() => navigateToTemplates(selectedReceipt)}
               className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
             >
               <FileText className="w-4 h-4 mr-2" />
