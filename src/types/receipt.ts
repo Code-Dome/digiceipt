@@ -1,13 +1,3 @@
-export type FieldType = 'text' | 'dropdown' | 'checkbox';
-
-export interface CustomField {
-  id: string;
-  type: FieldType;
-  label: string;
-  value: string;
-  options?: string[];
-}
-
 export interface Receipt {
   id: string;
   invoiceNo: string;
@@ -21,4 +11,22 @@ export interface Receipt {
   signature: string;
   removedFields?: string[];
   removedCustomFields?: CustomField[];
+}
+
+export interface CustomField {
+  id: string;
+  type: FieldType;
+  label: string;
+  value: string;
+  options?: string[];
+}
+
+export type FieldType = "text" | "dropdown" | "checkbox";
+
+export interface TemplateStyle {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  generateHTML: (receipt: Receipt, settings: CompanySettings) => string;
 }
