@@ -1,3 +1,5 @@
+import { CompanySettings } from "./companySettings";
+
 export interface Receipt {
   id: string;
   invoiceNo: string;
