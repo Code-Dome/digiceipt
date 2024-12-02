@@ -1,9 +1,10 @@
 import { Receipt } from "@/types/receipt";
 import html2canvas from "html2canvas";
 import { getTemplateById } from './templates';
+import { CompanySettings } from "@/types/companySettings";
 
 const getReceiptHTML = (receipt: Receipt) => {
-  const settings = JSON.parse(localStorage.getItem("companySettings") || "{}");
+  const settings: CompanySettings = JSON.parse(localStorage.getItem("companySettings") || "{}");
   const templateId = localStorage.getItem(`template_${receipt.id}`) || 
                     localStorage.getItem('defaultTemplate') || 
                     'modern-minimal';
@@ -20,7 +21,25 @@ export const printReceipt = async (receipt: Receipt) => {
   const html = getReceiptHTML(receipt);
   const printWindow = window.open('', '_blank');
   if (printWindow) {
-    printWindow.document.write(html);
+    printWindow.document.write(`
+      <html>
+        <head>
+          <style>
+            @page {
+              size: 148mm 210mm;
+              margin: 10mm;
+            }
+            body {
+              margin: 0;
+              padding: 10mm;
+              width: 128mm;
+              height: 190mm;
+            }
+          </style>
+        </head>
+        <body>${html}</body>
+      </html>
+    `);
     printWindow.document.close();
     printWindow.print();
     printWindow.close();
@@ -30,6 +49,8 @@ export const printReceipt = async (receipt: Receipt) => {
 export const downloadReceipt = async (receipt: Receipt) => {
   const container = document.createElement('div');
   container.innerHTML = getReceiptHTML(receipt);
+  container.style.width = '128mm';
+  container.style.padding = '10mm';
   document.body.appendChild(container);
   
   try {
@@ -37,7 +58,7 @@ export const downloadReceipt = async (receipt: Receipt) => {
       scale: 2,
       width: 148 * 3.78, // A5 width in pixels (96 DPI)
       height: 210 * 3.78, // A5 height in pixels (96 DPI)
-      backgroundColor: null,
+      backgroundColor: '#ffffff',
     });
     
     const link = document.createElement('a');

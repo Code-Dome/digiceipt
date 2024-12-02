@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { ReceiptTemplateIndicator } from "@/components/ReceiptTemplateIndicator";
 
 const Create = () => {
   const navigate = useNavigate();
@@ -39,6 +40,18 @@ const Create = () => {
     navigate("/view", { state: { focusId: receipt.id } });
   };
 
+  const previewReceipt: Receipt = {
+    id: 'preview',
+    invoiceNo: 'PREVIEW',
+    timestamp: new Date().toISOString(),
+    driverName: '',
+    horseReg: '',
+    companyName: '',
+    washType: '',
+    customFields: [],
+    signature: '',
+  };
+
   return (
     <div className="container py-8">
       <div className="flex items-center justify-between mb-8">
@@ -53,6 +66,7 @@ const Create = () => {
           </Button>
           <h1 className="text-3xl font-bold text-violet-700">Create Receipt</h1>
         </div>
+        <ReceiptTemplateIndicator receipt={previewReceipt} />
       </div>
       <ReceiptForm onSave={handleSave} onUpdate={() => {}} />
     </div>

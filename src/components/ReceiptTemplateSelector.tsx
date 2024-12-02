@@ -6,24 +6,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { receiptTemplates, TemplateStyle } from "@/utils/receiptTemplates";
+import { receiptTemplates } from "@/utils/templates";
 import { Receipt } from "@/types/receipt";
 import { CompanySettings } from "@/types/companySettings";
 import { useState } from "react";
 
 interface ReceiptTemplateSelectorProps {
   receipt: Receipt;
-  onTemplateSelect: (template: TemplateStyle) => void;
+  onTemplateSelect: (template: any) => void;
 }
 
 export const ReceiptTemplateSelector = ({
   receipt,
   onTemplateSelect,
 }: ReceiptTemplateSelectorProps) => {
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateStyle | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const settings: CompanySettings = JSON.parse(localStorage.getItem("companySettings") || "{}");
 
-  const handlePreview = (template: TemplateStyle) => {
+  const handlePreview = (template: any) => {
     setSelectedTemplate(template);
   };
 
