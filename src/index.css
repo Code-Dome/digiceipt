@@ -51,21 +51,6 @@
   }
 }
 
-[data-color-blind-mode="protanopia"] {
-  --primary: 45 93% 47%;
-  --secondary: 45 93% 37%;
-}
-
-[data-color-blind-mode="deuteranopia"] {
-  --primary: 220 83% 47%;
-  --secondary: 220 83% 37%;
-}
-
-[data-color-blind-mode="tritanopia"] {
-  --primary: 0 83% 47%;
-  --secondary: 0 83% 37%;
-}
-
 @layer base {
   * {
     @apply border-border;
@@ -77,11 +62,11 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary hover:bg-primary-dark text-white transition-colors duration-200;
+    @apply bg-primary hover:bg-primary/90 text-white transition-colors duration-200;
   }
   
   .btn-outline {
-    @apply bg-white hover:bg-primary-light text-primary border-primary-light transition-colors duration-200;
+    @apply bg-background hover:bg-muted text-foreground border-input transition-colors duration-200;
   }
 
   .card-hover {
@@ -89,10 +74,10 @@
   }
 
   .input-field {
-    @apply bg-white border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary;
+    @apply bg-background border border-input focus:border-primary focus:ring-1 focus:ring-primary;
   }
 }
 
 .signature-pad {
-  @apply w-full h-40 border border-gray-200 rounded-lg touch-none bg-white shadow-sm;
+  @apply w-full h-40 border border-input rounded-lg touch-none bg-background shadow-sm;
 }
