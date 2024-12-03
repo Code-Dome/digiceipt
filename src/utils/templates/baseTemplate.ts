@@ -12,10 +12,3 @@ export const baseStyles = `
     }
   }
 `;
-
-export interface TemplateProps {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-}
