@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
-import { receiptTemplates } from '@/utils/templates';
+import { getTemplateById } from '@/utils/templates';
 import { Receipt } from '@/types/receipt';
 import { CompanySettings } from '@/types/companySettings';
 
@@ -9,8 +9,10 @@ export const useReceiptActions = () => {
 
   const getReceiptTemplate = (receipt: Receipt) => {
     const settings: CompanySettings = JSON.parse(localStorage.getItem("companySettings") || "{}");
-    const templateId = localStorage.getItem(`template_${receipt.id}`) || localStorage.getItem('defaultTemplate') || 'modern-minimal';
-    const template = receiptTemplates.find(t => t.id === templateId) || receiptTemplates[0];
+    const templateId = localStorage.getItem(`template_${receipt.id}`) || 
+                      localStorage.getItem('defaultTemplate') || 
+                      'modern-minimal';
+    const template = getTemplateById(templateId);
     return template.generateHTML(receipt, settings);
   };
 
