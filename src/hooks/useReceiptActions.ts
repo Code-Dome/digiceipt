@@ -58,24 +58,36 @@ export const useReceiptActions = () => {
   };
 
   const downloadReceipt = async (receipt: Receipt) => {
+    // Create a temporary container with proper A5 dimensions
     const container = document.createElement('div');
     container.innerHTML = getReceiptTemplate(receipt);
-    container.style.width = '148mm';
-    container.style.height = '210mm';
+    container.style.position = 'fixed';  // Take it out of document flow
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '148mm';     // A5 width
+    container.style.height = '210mm';    // A5 height
     container.style.margin = '0';
     container.style.padding = '0';
+    container.style.backgroundColor = '#ffffff';
+    container.style.transform = 'scale(1)'; // Ensure no scaling
+    container.style.transformOrigin = 'top left';
+    
+    // Add container to body temporarily
     document.body.appendChild(container);
     
     try {
       const canvas = await html2canvas(container, {
         scale: 2,
-        width: 148 * 3.78, // A5 width in pixels (96 DPI)
-        height: 210 * 3.78, // A5 height in pixels (96 DPI)
+        width: 559,  // 148mm in pixels at 96 DPI
+        height: 794, // 210mm in pixels at 96 DPI
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false,
-        windowWidth: 148 * 3.78,
-        windowHeight: 210 * 3.78
+        windowWidth: 559,
+        windowHeight: 794,
+        foreignObjectRendering: true,
+        removeContainer: true,
+        allowTaint: true,
       });
       
       const link = document.createElement('a');
