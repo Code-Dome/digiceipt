@@ -9,10 +9,8 @@ export const useReceiptActions = () => {
 
   const getReceiptTemplate = (receipt: Receipt) => {
     const settings: CompanySettings = JSON.parse(localStorage.getItem("companySettings") || "{}");
-    const templateId = localStorage.getItem(`template_${receipt.id}`) || 
-                      localStorage.getItem('defaultTemplate') || 
-                      'modern-minimal';
-    const template = getTemplateById(templateId);
+    const templateId = localStorage.getItem(`template_${receipt.id}`);
+    const template = getTemplateById(templateId || 'modern-minimal');
     return template.generateHTML(receipt, settings);
   };
 
@@ -35,11 +33,15 @@ export const useReceiptActions = () => {
                 padding: 0;
                 width: 148mm;
                 height: 210mm;
+                overflow: hidden;
               }
               @media print {
                 body {
                   -webkit-print-color-adjust: exact;
                   print-color-adjust: exact;
+                }
+                @page {
+                  margin: 0;
                 }
               }
             </style>
@@ -59,15 +61,21 @@ export const useReceiptActions = () => {
     const container = document.createElement('div');
     container.innerHTML = getReceiptTemplate(receipt);
     container.style.width = '148mm';
+    container.style.height = '210mm';
+    container.style.margin = '0';
     container.style.padding = '0';
     document.body.appendChild(container);
     
     try {
       const canvas = await html2canvas(container, {
         scale: 2,
-        width: 148 * 3.78,
-        height: 210 * 3.78,
+        width: 148 * 3.78, // A5 width in pixels (96 DPI)
+        height: 210 * 3.78, // A5 height in pixels (96 DPI)
         backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false,
+        windowWidth: 148 * 3.78,
+        windowHeight: 210 * 3.78
       });
       
       const link = document.createElement('a');

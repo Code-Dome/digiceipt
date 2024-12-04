@@ -7,19 +7,15 @@ export const useReceiptTemplate = (receipt: Receipt) => {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateStyle | undefined>();
 
   useEffect(() => {
-    const templateId = localStorage.getItem(`template_${receipt.id}`) || 
-                      localStorage.getItem('defaultTemplate') || 
-                      'modern-minimal';
+    const storedTemplateId = localStorage.getItem(`template_${receipt.id}`);
+    const defaultTemplateId = localStorage.getItem('defaultTemplate');
+    const templateId = storedTemplateId || defaultTemplateId || 'modern-minimal';
     const template = getTemplateById(templateId);
     setSelectedTemplate(template);
   }, [receipt.id]);
 
   const updateTemplate = (template: TemplateStyle) => {
-    if (receipt.id !== 'preview') {
-      localStorage.setItem(`template_${receipt.id}`, template.id);
-    } else {
-      localStorage.setItem('defaultTemplate', template.id);
-    }
+    localStorage.setItem(`template_${receipt.id}`, template.id);
     setSelectedTemplate(template);
   };
 
