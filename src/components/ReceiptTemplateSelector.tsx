@@ -10,6 +10,7 @@ import { receiptTemplates } from "@/utils/templates";
 import { Receipt } from "@/types/receipt";
 import { CompanySettings } from "@/types/companySettings";
 import { useState } from "react";
+import { useReceiptTemplate } from "@/hooks/useReceiptTemplate";
 
 interface ReceiptTemplateSelectorProps {
   receipt: Receipt;
@@ -20,16 +21,18 @@ export const ReceiptTemplateSelector = ({
   receipt,
   onTemplateSelect,
 }: ReceiptTemplateSelectorProps) => {
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const { selectedTemplate, updateTemplate } = useReceiptTemplate(receipt);
+  const [previewTemplate, setPreviewTemplate] = useState<any>(selectedTemplate);
   const settings: CompanySettings = JSON.parse(localStorage.getItem("companySettings") || "{}");
 
   const handlePreview = (template: any) => {
-    setSelectedTemplate(template);
+    setPreviewTemplate(template);
   };
 
   const handleSelect = () => {
-    if (selectedTemplate) {
-      onTemplateSelect(selectedTemplate);
+    if (previewTemplate) {
+      updateTemplate(previewTemplate);
+      onTemplateSelect(previewTemplate);
     }
   };
 
@@ -49,7 +52,7 @@ export const ReceiptTemplateSelector = ({
             <div
               key={template.id}
               className={`border rounded-lg p-4 cursor-pointer hover:border-violet-500 transition-all ${
-                selectedTemplate?.id === template.id ? 'border-violet-500 ring-2 ring-violet-200' : ''
+                previewTemplate?.id === template.id ? 'border-violet-500 ring-2 ring-violet-200' : ''
               }`}
               onClick={() => handlePreview(template)}
             >
@@ -68,7 +71,7 @@ export const ReceiptTemplateSelector = ({
         <div className="flex justify-end mt-4">
           <Button
             onClick={handleSelect}
-            disabled={!selectedTemplate}
+            disabled={!previewTemplate}
             className="bg-violet-600 hover:bg-violet-700"
           >
             Use Template
