@@ -21,18 +21,26 @@ export const useReceiptActions = () => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(`
+        <!DOCTYPE html>
         <html>
           <head>
+            <title>Receipt #${receipt.invoiceNo}</title>
             <style>
               @page {
                 size: 148mm 210mm;
-                margin: 10mm;
+                margin: 0;
               }
               body {
                 margin: 0;
-                padding: 10mm;
-                width: 128mm;
-                height: 190mm;
+                padding: 0;
+                width: 148mm;
+                height: 210mm;
+              }
+              @media print {
+                body {
+                  -webkit-print-color-adjust: exact;
+                  print-color-adjust: exact;
+                }
               }
             </style>
           </head>
@@ -40,23 +48,25 @@ export const useReceiptActions = () => {
         </html>
       `);
       printWindow.document.close();
-      printWindow.print();
-      printWindow.close();
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 250);
     }
   };
 
   const downloadReceipt = async (receipt: Receipt) => {
     const container = document.createElement('div');
     container.innerHTML = getReceiptTemplate(receipt);
-    container.style.width = '128mm';
-    container.style.padding = '10mm';
+    container.style.width = '148mm';
+    container.style.padding = '0';
     document.body.appendChild(container);
     
     try {
       const canvas = await html2canvas(container, {
         scale: 2,
-        width: 148 * 3.78, // A5 width in pixels (96 DPI)
-        height: 210 * 3.78, // A5 height in pixels (96 DPI)
+        width: 148 * 3.78,
+        height: 210 * 3.78,
         backgroundColor: '#ffffff',
       });
       
