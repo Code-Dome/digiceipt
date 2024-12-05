@@ -8,7 +8,7 @@ export const downloadReceipt = async (receipt: Receipt) => {
 
   // Add padding and adjust styles
   container.style.width = '595px'; // Match canvas width
-  container.style.height = '420px'; // Match canvas height
+  container.style.height = '620px'; // Match canvas height
   container.style.padding = '20px'; // Add padding
   container.style.boxSizing = 'border-box'; // Include padding in the box model
   container.style.background = 'white'; // Ensure white background
