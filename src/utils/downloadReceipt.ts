@@ -7,7 +7,7 @@ export const downloadReceipt = async (receipt: Receipt) => {
   container.innerHTML = generateReceiptHTML(receipt);
   container.style.width = '559px';
   container.style.height = '794px';
-  container.style.position = 'absolute';
+  container.style.position = 'relative';
   //container.style.left = '-9999px';
   container.style.background = 'white';
 
