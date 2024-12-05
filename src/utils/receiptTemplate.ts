@@ -10,17 +10,13 @@ export const generateReceiptHTML = (receipt: Receipt) => {
       <head>
         <meta charset="utf-8">
         <style>
-          @page {
-            margin: 0;
-          }
           body {
             margin: 0;
             padding: 20px;
             font-family: system-ui, -apple-system, sans-serif;
             background: white;
-            width: 148mm;
-            height: 210mm;
-            position: relative;
+            width: 519px; /* 148mm - 40px padding */
+            height: 754px; /* 210mm - 40px padding */
           }
           .receipt-container {
             width: 100%;
@@ -32,6 +28,8 @@ export const generateReceiptHTML = (receipt: Receipt) => {
           .header {
             text-align: center;
             margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #6E59A5;
           }
           .header h2 {
             margin: 0;
@@ -84,7 +82,7 @@ export const generateReceiptHTML = (receipt: Receipt) => {
         <div class="receipt-container">
           <div class="header">
             <h2>${settings.companyName || 'Company Name'}</h2>
-            <p>${settings.address || ''}</p>
+            ${settings.address ? `<p>${settings.address}</p>` : ''}
           </div>
           
           <div class="content">
@@ -96,22 +94,30 @@ export const generateReceiptHTML = (receipt: Receipt) => {
               <strong>Date:</strong>
               <span>${receipt.timestamp}</span>
             </div>
-            <div class="field">
-              <strong>Driver:</strong>
-              <span>${receipt.driverName}</span>
-            </div>
-            <div class="field">
-              <strong>Horse Reg:</strong>
-              <span>${receipt.horseReg}</span>
-            </div>
-            <div class="field">
-              <strong>Company:</strong>
-              <span>${receipt.companyName}</span>
-            </div>
-            <div class="field">
-              <strong>Wash Type:</strong>
-              <span>${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}</span>
-            </div>
+            ${receipt.driverName ? `
+              <div class="field">
+                <strong>Driver:</strong>
+                <span>${receipt.driverName}</span>
+              </div>
+            ` : ''}
+            ${receipt.horseReg ? `
+              <div class="field">
+                <strong>Horse Reg:</strong>
+                <span>${receipt.horseReg}</span>
+              </div>
+            ` : ''}
+            ${receipt.companyName ? `
+              <div class="field">
+                <strong>Company:</strong>
+                <span>${receipt.companyName}</span>
+              </div>
+            ` : ''}
+            ${receipt.washType ? `
+              <div class="field">
+                <strong>Wash Type:</strong>
+                <span>${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}</span>
+              </div>
+            ` : ''}
             ${receipt.customFields.map(field => `
               <div class="field">
                 <strong>${field.label}:</strong>
