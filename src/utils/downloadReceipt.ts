@@ -7,7 +7,7 @@ export const downloadReceipt = async (receipt: Receipt) => {
   container.innerHTML = generateReceiptHTML(receipt);
 
   // Add padding and adjust styles
-  container.style.width = '559px'; // Match canvas width
+  container.style.width = '1559px'; // Match canvas width
   container.style.padding = '20px'; // Add padding
   container.style.boxSizing = 'border-box'; // Include padding in the box model
   container.style.background = 'white'; // Ensure white background
