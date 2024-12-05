@@ -11,7 +11,7 @@ const generateReceiptHTML = (receipt: Receipt) => {
       <head>
         <style>
           @page {
-            size: A5;
+            size: A5 portrait;
             margin: 0;
           }
           body {
@@ -21,75 +21,113 @@ const generateReceiptHTML = (receipt: Receipt) => {
             height: 210mm;
             font-family: system-ui, sans-serif;
             background: white;
-            box-sizing: border-box;
           }
           .receipt-container {
-            width: 100%;
-            height: 100%;
+            padding: 20px;
+            height: calc(100% - 40px);
             display: flex;
             flex-direction: column;
+            gap: 20px;
             background: white;
           }
           .header {
             text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
+          }
+          .header h2 {
+            margin: 0;
+            color: #6E59A5;
+            font-size: 24px;
+          }
+          .header p {
+            margin: 5px 0;
+            color: #666;
           }
           .content {
-            padding: 15px;
-            flex-grow: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
           }
           .field {
-            margin: 10px 0;
-            padding: 5px 0;
+            display: flex;
+            padding: 8px 0;
             border-bottom: 1px solid #eee;
           }
           .field strong {
+            width: 120px;
             color: #666;
-            min-width: 120px;
-            display: inline-block;
+          }
+          .field span {
+            flex: 1;
           }
           .signature {
-            margin-top: 30px;
+            margin-top: auto;
+            padding-top: 20px;
             text-align: center;
           }
           .signature img {
             max-width: 200px;
-            margin: 10px auto;
+            margin: 0 auto;
+            display: block;
+          }
+          .signature p {
+            margin: 5px 0;
+            color: #666;
           }
           .footer {
             margin-top: 20px;
-            padding: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
             font-size: 12px;
             color: #666;
             text-align: center;
-            border-top: 1px solid #eee;
           }
         </style>
       </head>
       <body>
         <div class="receipt-container">
           <div class="header">
-            <h2 style="margin: 0; color: #6E59A5; font-size: 24px;">${settings.companyName || 'Company Name'}</h2>
-            <p style="margin: 5px 0; color: #666;">${settings.address || ''}</p>
+            <h2>${settings.companyName || 'Company Name'}</h2>
+            <p>${settings.address || ''}</p>
           </div>
           
           <div class="content">
-            <div class="field"><strong>Invoice #:</strong> ${receipt.invoiceNo}</div>
-            <div class="field"><strong>Date:</strong> ${receipt.timestamp}</div>
-            <div class="field"><strong>Driver:</strong> ${receipt.driverName}</div>
-            <div class="field"><strong>Horse Reg:</strong> ${receipt.horseReg}</div>
-            <div class="field"><strong>Company:</strong> ${receipt.companyName}</div>
-            <div class="field"><strong>Wash Type:</strong> ${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}</div>
+            <div class="field">
+              <strong>Invoice #:</strong>
+              <span>${receipt.invoiceNo}</span>
+            </div>
+            <div class="field">
+              <strong>Date:</strong>
+              <span>${receipt.timestamp}</span>
+            </div>
+            <div class="field">
+              <strong>Driver:</strong>
+              <span>${receipt.driverName}</span>
+            </div>
+            <div class="field">
+              <strong>Horse Reg:</strong>
+              <span>${receipt.horseReg}</span>
+            </div>
+            <div class="field">
+              <strong>Company:</strong>
+              <span>${receipt.companyName}</span>
+            </div>
+            <div class="field">
+              <strong>Wash Type:</strong>
+              <span>${receipt.washType}${receipt.otherWashType ? ` - ${receipt.otherWashType}` : ''}</span>
+            </div>
             ${receipt.customFields.map(field => `
-              <div class="field"><strong>${field.label}:</strong> ${field.value}</div>
+              <div class="field">
+                <strong>${field.label}:</strong>
+                <span>${field.value}</span>
+              </div>
             `).join('')}
           </div>
           
           ${receipt.signature ? `
             <div class="signature">
-              <img src="${receipt.signature}" style="max-width: 200px; margin: 10px auto;" />
-              <p style="margin: 5px 0; color: #666;">Signature</p>
+              <img src="${receipt.signature}" alt="Signature" />
+              <p>Signature</p>
             </div>
           ` : ''}
           
