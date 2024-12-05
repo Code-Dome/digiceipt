@@ -11,7 +11,7 @@ const generateReceiptHTML = (receipt: Receipt) => {
       <head>
         <style>
           @page {
-            size: 148mm 210mm;
+            size: A5;
             margin: 0;
           }
           body {
@@ -20,37 +20,50 @@ const generateReceiptHTML = (receipt: Receipt) => {
             width: 148mm;
             height: 210mm;
             font-family: system-ui, sans-serif;
-            background: linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%);
+            background: white;
+            box-sizing: border-box;
           }
           .receipt-container {
+            width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
+            background: white;
           }
           .header {
             text-align: center;
             margin-bottom: 20px;
+            padding: 10px;
           }
           .content {
-            background: white;
             padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             flex-grow: 1;
           }
           .field {
-            margin: 5px 0;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+          }
+          .field strong {
+            color: #666;
+            min-width: 120px;
+            display: inline-block;
           }
           .signature {
+            margin-top: 30px;
             text-align: center;
-            margin-top: auto;
+          }
+          .signature img {
+            max-width: 200px;
+            margin: 10px auto;
           }
           .footer {
             margin-top: 20px;
+            padding: 10px;
             font-size: 12px;
             color: #666;
             text-align: center;
+            border-top: 1px solid #eee;
           }
         </style>
       </head>
@@ -75,7 +88,7 @@ const generateReceiptHTML = (receipt: Receipt) => {
           
           ${receipt.signature ? `
             <div class="signature">
-              <img src="${receipt.signature}" style="max-width: 200px; margin: 10px 0;" />
+              <img src="${receipt.signature}" style="max-width: 200px; margin: 10px auto;" />
               <p style="margin: 5px 0; color: #666;">Signature</p>
             </div>
           ` : ''}
