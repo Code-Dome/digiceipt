@@ -3,37 +3,33 @@ import { generateReceiptHTML } from "./receiptTemplate";
 import html2canvas from "html2canvas";
 
 export const downloadReceipt = async (receipt: Receipt) => {
-  // Create a temporary container
   const container = document.createElement('div');
-  container.style.width = '559px'; // 148mm at 96 DPI
-  container.style.height = '794px'; // 210mm at 96 DPI
+  container.style.width = '559px';
+  container.style.height = '794px';
   container.style.position = 'absolute';
   container.style.left = '-9999px';
   container.style.background = 'white';
-  
-  // Generate and insert HTML
+
   const htmlContent = generateReceiptHTML(receipt);
   container.innerHTML = htmlContent;
   document.body.appendChild(container);
-  
+
   try {
-    console.log('Generating receipt for:', receipt); // Debug log
-    
+    console.log('Generated HTML:', container.innerHTML); // Debug
+
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Ensure content is rendered
+
     const canvas = await html2canvas(container, {
       scale: 2,
       width: 559,
       height: 794,
       backgroundColor: '#ffffff',
       useCORS: true,
-      logging: true, // Enable logging for debugging
+      logging: true,
       windowWidth: 559,
       windowHeight: 794,
-      foreignObjectRendering: true,
-      removeContainer: true,
-      allowTaint: true,
     });
-    
-    // Create download link
+
     const link = document.createElement('a');
     link.download = `receipt-${receipt.invoiceNo}.png`;
     link.href = canvas.toDataURL('image/png');
@@ -41,7 +37,6 @@ export const downloadReceipt = async (receipt: Receipt) => {
   } catch (error) {
     console.error('Error generating receipt:', error);
   } finally {
-    // Clean up
     if (document.body.contains(container)) {
       document.body.removeChild(container);
     }
