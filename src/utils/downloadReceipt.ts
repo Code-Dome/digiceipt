@@ -8,7 +8,7 @@ export const downloadReceipt = async (receipt: Receipt) => {
   container.style.width = '559px';
   container.style.height = '794px';
   container.style.position = 'absolute';
-  container.style.left = '-9999px';
+  //container.style.left = '-9999px';
   container.style.background = 'white';
 
   document.body.appendChild(container);
