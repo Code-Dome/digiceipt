@@ -7,8 +7,8 @@ export const downloadReceipt = async (receipt: Receipt) => {
   container.innerHTML = generateReceiptHTML(receipt);
 
   // Set container styles with padding
-  container.style.width = '559px';
-  container.style.height = '794px';
+  container.style.width = '600px';
+  container.style.height = '850px';
   container.style.padding = '20px'; // Add padding to ensure content is not cut off
   container.style.boxSizing = 'border-box'; // Include padding in width and height
   container.style.position = 'relative';
