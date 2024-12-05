@@ -4,14 +4,13 @@ import html2canvas from "html2canvas";
 
 export const downloadReceipt = async (receipt: Receipt) => {
   const container = document.createElement('div');
+  container.innerHTML = generateReceiptHTML(receipt);
   container.style.width = '559px';
   container.style.height = '794px';
   container.style.position = 'absolute';
   container.style.left = '-9999px';
   container.style.background = 'white';
 
-  const htmlContent = generateReceiptHTML(receipt);
-  container.innerHTML = htmlContent;
   document.body.appendChild(container);
 
   try {
