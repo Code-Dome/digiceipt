@@ -11,7 +11,7 @@ const Archive = () => {
 
   useEffect(() => {
     const loadArchivedReceipts = () => {
-      const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]');
+      const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
       // Ensure no duplicates by using a Map with ID as key
       const uniqueReceipts = Array.from(
         new Map(archived.map((receipt: Receipt) => [receipt.id, receipt])).values()
@@ -23,7 +23,7 @@ const Archive = () => {
   }, []);
 
   const handleUnarchive = (receipt: Receipt) => {
-    const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]');
+    const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
     activeReceipts.push(receipt);
     localStorage.setItem('receipts', JSON.stringify(activeReceipts));
     
