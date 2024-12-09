@@ -51,6 +51,14 @@ const View = () => {
           <h1 className="text-3xl font-bold text-violet-700">View Receipts</h1>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/archive')}
+            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+          >
+            <Archive className="w-4 h-4 mr-2" />
+            View Archive
+          </Button>
           <Button 
             onClick={() => navigate('/create')}
             className="bg-violet-600 hover:bg-violet-700"
