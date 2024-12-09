@@ -4,17 +4,19 @@ import { InvoiceTable } from "@/components/InvoiceList/InvoiceTable";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Archive = () => {
   const [archivedReceipts, setArchivedReceipts] = useState<Receipt[]>([]);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const loadArchivedReceipts = () => {
       const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
       // Ensure no duplicates by using a Map with ID as key
       const uniqueReceipts = Array.from(
-        new Map(archived.map((receipt: Receipt) => [receipt.id, receipt])).values()
+        new Map(archived.map((receipt) => [receipt.id, receipt])).values()
       );
       setArchivedReceipts(uniqueReceipts);
     };
@@ -23,19 +25,42 @@ const Archive = () => {
   }, []);
 
   const handleUnarchive = (receipt: Receipt) => {
+    // Get current active receipts and ensure no duplicates
     const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
-    activeReceipts.push(receipt);
-    localStorage.setItem('receipts', JSON.stringify(activeReceipts));
+    const existingReceipt = activeReceipts.find(r => r.id === receipt.id);
     
-    const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
-    setArchivedReceipts(updatedArchived);
-    localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
+    if (!existingReceipt) {
+      // Only add if not already present
+      activeReceipts.push(receipt);
+      localStorage.setItem('receipts', JSON.stringify(activeReceipts));
+      
+      // Remove from archived receipts
+      const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
+      setArchivedReceipts(updatedArchived);
+      localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
+      
+      toast({
+        title: "Receipt restored",
+        description: `Invoice #${receipt.invoiceNo} has been restored to active receipts.`,
+      });
+    } else {
+      toast({
+        title: "Receipt already exists",
+        description: `Invoice #${receipt.invoiceNo} is already in active receipts.`,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = (receipt: Receipt) => {
     const updatedReceipts = archivedReceipts.filter(r => r.id !== receipt.id);
     setArchivedReceipts(updatedReceipts);
     localStorage.setItem('archivedReceipts', JSON.stringify(updatedReceipts));
+    
+    toast({
+      title: "Receipt deleted",
+      description: `Invoice #${receipt.invoiceNo} has been permanently deleted.`,
+    });
   };
 
   return (

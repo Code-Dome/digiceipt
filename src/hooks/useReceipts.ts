@@ -8,25 +8,40 @@ export const useReceipts = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
-    setReceipts(savedReceipts);
-    setFilteredReceipts(savedReceipts);
+    const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]") as Receipt[];
+    // Ensure no duplicates in initial load
+    const uniqueReceipts = Array.from(
+      new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
+    );
+    setReceipts(uniqueReceipts);
+    setFilteredReceipts(uniqueReceipts);
   }, []);
 
   const handleArchive = (receipt: Receipt) => {
-    const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]");
-    localStorage.setItem("archivedReceipts", JSON.stringify([...archivedReceipts, receipt]));
+    const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
+    // Check if receipt already exists in archive
+    const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
     
-    const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
-    localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
-    
-    setReceipts(updatedReceipts);
-    setFilteredReceipts(updatedReceipts);
-    
-    toast({
-      title: "Receipt archived",
-      description: `Invoice #${receipt.invoiceNo} has been archived.`,
-    });
+    if (!existingArchived) {
+      localStorage.setItem("archivedReceipts", JSON.stringify([...archivedReceipts, receipt]));
+      
+      const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
+      localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
+      
+      setReceipts(updatedReceipts);
+      setFilteredReceipts(updatedReceipts);
+      
+      toast({
+        title: "Receipt archived",
+        description: `Invoice #${receipt.invoiceNo} has been archived.`,
+      });
+    } else {
+      toast({
+        title: "Already archived",
+        description: `Invoice #${receipt.invoiceNo} is already in the archive.`,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = (receipt: Receipt) => {
@@ -34,6 +49,11 @@ export const useReceipts = () => {
     setReceipts(updatedReceipts);
     setFilteredReceipts(updatedReceipts);
     localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
+    
+    toast({
+      title: "Receipt deleted",
+      description: `Invoice #${receipt.invoiceNo} has been deleted.`,
+    });
   };
 
   const handleFilterChange = (filters: Record<string, string>) => {
