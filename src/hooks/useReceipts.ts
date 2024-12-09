@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Receipt } from '@/types/receipt';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -23,13 +23,14 @@ export const useReceipts = () => {
     const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
     
     if (!existingArchived) {
+      // Update localStorage
       localStorage.setItem("archivedReceipts", JSON.stringify([...archivedReceipts, receipt]));
       
+      // Update UI state
       const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
-      localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
-      
       setReceipts(updatedReceipts);
       setFilteredReceipts(updatedReceipts);
+      localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
       
       toast({
         title: "Receipt archived",

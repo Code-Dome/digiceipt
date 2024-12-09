@@ -4,23 +4,23 @@ import { InvoiceTable } from "@/components/InvoiceList/InvoiceTable";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Archive = () => {
   const [archivedReceipts, setArchivedReceipts] = useState<Receipt[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const loadArchivedReceipts = () => {
-      const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
-      // Ensure no duplicates by using a Map with ID as key
-      const uniqueReceipts = Array.from(
-        new Map(archived.map((receipt) => [receipt.id, receipt])).values()
-      );
-      setArchivedReceipts(uniqueReceipts);
-    };
+  const loadArchivedReceipts = () => {
+    const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
+    // Ensure no duplicates by using a Map with ID as key
+    const uniqueReceipts = Array.from(
+      new Map(archived.map((receipt) => [receipt.id, receipt])).values()
+    );
+    setArchivedReceipts(uniqueReceipts);
+  };
 
+  useEffect(() => {
     loadArchivedReceipts();
   }, []);
 
