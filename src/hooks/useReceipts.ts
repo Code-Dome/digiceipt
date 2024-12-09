@@ -9,7 +9,6 @@ export const useReceipts = () => {
 
   useEffect(() => {
     const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]") as Receipt[];
-    // Ensure no duplicates in initial load
     const uniqueReceipts = Array.from(
       new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
     );
@@ -19,14 +18,14 @@ export const useReceipts = () => {
 
   const handleArchive = (receipt: Receipt) => {
     const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
-    // Check if receipt already exists in archive
     const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
     
     if (!existingArchived) {
-      // Update localStorage
-      localStorage.setItem("archivedReceipts", JSON.stringify([...archivedReceipts, receipt]));
+      // Update archived receipts
+      const updatedArchived = [...archivedReceipts, receipt];
+      localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
       
-      // Update UI state
+      // Update active receipts
       const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
       setReceipts(updatedReceipts);
       setFilteredReceipts(updatedReceipts);

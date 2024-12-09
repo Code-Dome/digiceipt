@@ -13,7 +13,6 @@ const Archive = () => {
 
   const loadArchivedReceipts = () => {
     const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
-    // Ensure no duplicates by using a Map with ID as key
     const uniqueReceipts = Array.from(
       new Map(archived.map((receipt) => [receipt.id, receipt])).values()
     );
@@ -25,12 +24,12 @@ const Archive = () => {
   }, []);
 
   const handleUnarchive = (receipt: Receipt) => {
-    // Get current active receipts and ensure no duplicates
+    // Get current active receipts
     const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
     const existingReceipt = activeReceipts.find(r => r.id === receipt.id);
     
     if (!existingReceipt) {
-      // Only add if not already present
+      // Add to active receipts
       activeReceipts.push(receipt);
       localStorage.setItem('receipts', JSON.stringify(activeReceipts));
       
