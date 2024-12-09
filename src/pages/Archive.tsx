@@ -10,18 +10,32 @@ const Archive = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]');
-    setArchivedReceipts(archived);
+    const loadArchivedReceipts = () => {
+      const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]');
+      // Ensure no duplicates by using a Map with ID as key
+      const uniqueReceipts = Array.from(
+        new Map(archived.map((receipt: Receipt) => [receipt.id, receipt])).values()
+      );
+      setArchivedReceipts(uniqueReceipts);
+    };
+
+    loadArchivedReceipts();
   }, []);
 
   const handleUnarchive = (receipt: Receipt) => {
-    const updatedReceipts = archivedReceipts.filter(r => r.id !== receipt.id);
-    setArchivedReceipts(updatedReceipts);
+    const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]');
+    activeReceipts.push(receipt);
+    localStorage.setItem('receipts', JSON.stringify(activeReceipts));
+    
+    const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
+    setArchivedReceipts(updatedArchived);
+    localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
   };
 
   const handleDelete = (receipt: Receipt) => {
     const updatedReceipts = archivedReceipts.filter(r => r.id !== receipt.id);
     setArchivedReceipts(updatedReceipts);
+    localStorage.setItem('archivedReceipts', JSON.stringify(updatedReceipts));
   };
 
   return (
