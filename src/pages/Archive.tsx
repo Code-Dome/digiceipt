@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useReceipts } from "@/hooks/useReceipts";
 
 const Archive = () => {
   const [archivedReceipts, setArchivedReceipts] = useState<Receipt[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { loadReceipts } = useReceipts(); // Get loadReceipts from the hook
 
   const loadArchivedReceipts = () => {
     const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
@@ -24,19 +26,21 @@ const Archive = () => {
   }, []);
 
   const handleUnarchive = (receipt: Receipt) => {
-    // Get current active receipts
     const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
     const existingReceipt = activeReceipts.find(r => r.id === receipt.id);
     
     if (!existingReceipt) {
-      // Add to active receipts
-      activeReceipts.push(receipt);
-      localStorage.setItem('receipts', JSON.stringify(activeReceipts));
+      // Update active receipts
+      const updatedActive = [...activeReceipts, receipt];
+      localStorage.setItem('receipts', JSON.stringify(updatedActive));
       
-      // Remove from archived receipts
+      // Update archived receipts in localStorage and state
       const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
-      setArchivedReceipts(updatedArchived);
       localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
+      setArchivedReceipts(updatedArchived);
+      
+      // Refresh the active receipts list
+      loadReceipts();
       
       toast({
         title: "Receipt restored",

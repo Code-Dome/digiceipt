@@ -7,13 +7,17 @@ export const useReceipts = () => {
   const [filteredReceipts, setFilteredReceipts] = useState<Receipt[]>([]);
   const { toast } = useToast();
 
-  useEffect(() => {
+  const loadReceipts = () => {
     const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]") as Receipt[];
     const uniqueReceipts = Array.from(
       new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
     );
     setReceipts(uniqueReceipts);
     setFilteredReceipts(uniqueReceipts);
+  };
+
+  useEffect(() => {
+    loadReceipts();
   }, []);
 
   const handleArchive = (receipt: Receipt) => {
@@ -25,11 +29,11 @@ export const useReceipts = () => {
       const updatedArchived = [...archivedReceipts, receipt];
       localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
       
-      // Update active receipts
+      // Update active receipts in localStorage and state
       const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
+      localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
       setReceipts(updatedReceipts);
       setFilteredReceipts(updatedReceipts);
-      localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
       
       toast({
         title: "Receipt archived",
@@ -103,5 +107,6 @@ export const useReceipts = () => {
     handleArchive,
     handleDelete,
     handleFilterChange,
+    loadReceipts, // Export loadReceipts for manual refresh
   };
 };
