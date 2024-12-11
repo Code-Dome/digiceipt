@@ -12,9 +12,9 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <Router>
+    <Router>
+      <ThemeProvider>
+        <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -51,10 +51,10 @@ function App() {
               }
             />
           </Routes>
-        </Router>
-        <Toaster />
-      </AuthProvider>
-    </ThemeProvider>
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
+    </Router>
   );
 }
 
