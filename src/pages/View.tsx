@@ -11,7 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Archive, Printer, Download, Home, FileText, Settings } from "lucide-react";
+import { Plus, Archive, Printer, Download, Home, Settings } from "lucide-react";
 import { CompanySettings } from "@/components/CompanySettings";
 import { useReceipts } from "@/hooks/useReceipts";
 import { useReceiptActions } from "@/hooks/useReceiptActions";
@@ -114,14 +114,6 @@ const View = () => {
             >
               <Archive className="w-4 h-4 mr-2" />
               Archive
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigateToTemplates(selectedReceipt)}
-              className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
-            >
-              <FileText className="w-4 h-4 mr-2" />
-              Choose Template
             </Button>
           </div>
         )}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Receipt } from '@/types/receipt';
 import { useToast } from '@/hooks/use-toast';
+import { parse, isValid } from 'date-fns';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -67,23 +68,36 @@ export const useReceipts = () => {
       );
     }
 
-    if (filters.dateFrom) {
+    if (filters.dateFrom || filters.dateTo) {
       filtered = filtered.filter((receipt) => {
-        const receiptDate = new Date(receipt.timestamp.split('/').reverse().join('-'));
-        const fromDate = new Date(filters.dateFrom);
-        return receiptDate >= fromDate;
+        const receiptDate = parse(receipt.timestamp, 'dd/MM/yyyy', new Date());
+        
+        if (!isValid(receiptDate)) {
+          return true; // Skip invalid dates
+        }
+
+        if (filters.dateFrom) {
+          const fromDate = parse(filters.dateFrom, 'dd/MM/yyyy', new Date());
+          if (isValid(fromDate) && receiptDate < fromDate) {
+            return false;
+          }
+        }
+
+        if (filters.dateTo) {
+          const toDate = parse(filters.dateTo, 'dd/MM/yyyy', new Date());
+          if (isValid(toDate)) {
+            toDate.setHours(23, 59, 59, 999);
+            if (receiptDate > toDate) {
+              return false;
+            }
+          }
+        }
+
+        return true;
       });
     }
 
-    if (filters.dateTo) {
-      filtered = filtered.filter((receipt) => {
-        const receiptDate = new Date(receipt.timestamp.split('/').reverse().join('-'));
-        const toDate = new Date(filters.dateTo);
-        toDate.setHours(23, 59, 59, 999);
-        return receiptDate <= toDate;
-      });
-    }
-
+    // Handle custom field filters
     Object.entries(filters).forEach(([key, value]) => {
       if (!["invoiceNo", "dateFrom", "dateTo"].includes(key) && value) {
         filtered = filtered.filter((receipt) => {
