@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { Receipt } from "@/types/receipt";
+import { CompanySelect } from "./ReceiptForm/CompanySelect";
 
 interface DefaultFieldsProps {
   fields: { key: string; label: string }[];
@@ -37,11 +38,19 @@ export const DefaultFields = ({
                   <X className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
-              <Input
-                id={key}
-                value={values[key as keyof Receipt] as string || ""}
-                onChange={(e) => onInputChange(key, e.target.value)}
-              />
+              {key === "companyName" ? (
+                <CompanySelect
+                  value={values[key]}
+                  onChange={(value) => onInputChange(key, value)}
+                />
+              ) : (
+                <Input
+                  id={key}
+                  value={values[key as keyof Receipt] as string || ""}
+                  onChange={(e) => onInputChange(key, e.target.value)}
+                  className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                />
+              )}
             </div>
           )
       )}

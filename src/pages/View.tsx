@@ -11,10 +11,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
-import { Plus, Archive, Printer, Download, Home, FileText } from "lucide-react";
+import { Plus, Archive, Printer, Download, Home, FileText, Settings } from "lucide-react";
 import { CompanySettings } from "@/components/CompanySettings";
 import { useReceipts } from "@/hooks/useReceipts";
 import { useReceiptActions } from "@/hooks/useReceiptActions";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const View = () => {
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
@@ -25,7 +26,8 @@ const View = () => {
     handleDelete, 
     handleFilterChange 
   } = useReceipts();
-  const { printReceipt, downloadReceipt, navigateToTemplates } = useReceiptActions();
+  const { printReceipt, downloadReceipt } = useReceiptActions();
+  const { isAdmin } = useAdminAuth();
 
   const handleUpdate = (updatedReceipt: Receipt) => {
     const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
@@ -37,31 +39,41 @@ const View = () => {
   };
 
   return (
-    <div className="container py-8">
+    <div className="container py-8 dark:bg-gray-900">
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
             onClick={() => navigate('/')}
-            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
           >
             <Home className="w-4 h-4 mr-2" />
             Dashboard
           </Button>
-          <h1 className="text-3xl font-bold text-violet-700">View Receipts</h1>
+          <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-400">View Receipts</h1>
         </div>
         <div className="flex gap-2">
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={() => navigate('/admin')}
+              className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Admin Settings
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={() => navigate('/archive')}
-            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
           >
             <Archive className="w-4 h-4 mr-2" />
             View Archive
           </Button>
           <Button 
             onClick={() => navigate('/create')}
-            className="bg-violet-600 hover:bg-violet-700"
+            className="bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-700 dark:hover:bg-violet-800"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Invoice
