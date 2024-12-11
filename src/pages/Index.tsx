@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, LogOut } from "lucide-react";
+import { Plus, FileText, LogOut, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { WashingStats } from "@/components/WashingStats";
@@ -7,7 +7,7 @@ import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, isAdmin } = useAuth();
 
   return (
     <div className="container py-8">
@@ -15,6 +15,15 @@ const Index = () => {
         <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-400">Digital Receipts</h1>
         <div className="flex gap-2 items-center">
           <ThemeSwitcher />
+          {isAdmin && (
+            <Button 
+              onClick={() => navigate("/admin")}
+              variant="outline"
+              className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+            >
+              <Settings className="mr-2 h-4 w-4" /> Admin
+            </Button>
+          )}
           <Button 
             onClick={() => logout()}
             variant="outline"
@@ -26,9 +35,9 @@ const Index = () => {
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 mb-8">
-        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700 h-full flex flex-col">
           <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">Create Receipt</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Generate a new digital receipt with custom fields and signature.</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">Generate a new digital receipt with custom fields and signature.</p>
           <Button 
             onClick={() => navigate("/create")}
             className="w-full bg-violet-600 hover:bg-violet-700 dark:bg-violet-700 dark:hover:bg-violet-800"
@@ -37,9 +46,9 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
+        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700 h-full flex flex-col">
           <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">View Receipts</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Access and manage all your created digital receipts.</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow">Access and manage all your created digital receipts.</p>
           <Button 
             onClick={() => navigate("/view")}
             className="w-full bg-violet-600 hover:bg-violet-700 dark:bg-violet-700 dark:hover:bg-violet-800"

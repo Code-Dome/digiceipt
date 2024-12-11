@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Receipt } from '@/types/receipt';
-import { useToast } from '@/hooks/use-toast';
-import { parse, isValid } from 'date-fns';
+import { useToast } from '@/components/ui/use-toast';
+import { parse, isValid, format } from 'date-fns';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -73,7 +73,7 @@ export const useReceipts = () => {
         const receiptDate = parse(receipt.timestamp, 'dd/MM/yyyy', new Date());
         
         if (!isValid(receiptDate)) {
-          return true; // Skip invalid dates
+          return false;
         }
 
         if (filters.dateFrom) {
