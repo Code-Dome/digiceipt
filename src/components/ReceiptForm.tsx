@@ -18,7 +18,7 @@ import { CustomFieldInput } from "./CustomFieldInput";
 import { SignaturePad } from "./SignaturePad";
 import { DefaultFields } from "./DefaultFields";
 import { RestoreFields } from "./RestoreFields";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface ReceiptFormProps {
   initialData?: Receipt;
@@ -154,7 +154,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
   return (
     <Card className="w-full">
       <CardContent className="p-6">
-        <div className="space-y-6">
+        <div className="space-y-8"> {/* Increased spacing from space-y-6 to space-y-8 */}
           <div className="flex justify-between">
             <div>
               <p className="font-semibold text-violet-700">Invoice #{receipt.invoiceNo}</p>
@@ -162,7 +162,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
             </div>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-6"> {/* Increased gap from gap-4 to gap-6 */}
             <DefaultFields
               fields={defaultFields}
               values={receipt}
@@ -179,7 +179,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
               onRestoreCustomField={restoreCustomField}
             />
 
-            <div className="grid gap-2">
+            <div className="grid gap-4 pt-4"> {/* Added pt-4 for extra padding top */}
               <Label htmlFor="washType">Wash Type</Label>
               <Select
                 value={receipt.washType}
