@@ -25,11 +25,9 @@ export const useReceipts = () => {
     const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
     
     if (!existingArchived) {
-      // Update archived receipts
       const updatedArchived = [...archivedReceipts, receipt];
       localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
       
-      // Update active receipts in localStorage and state
       const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
       localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
       setReceipts(updatedReceipts);
@@ -70,19 +68,18 @@ export const useReceipts = () => {
     }
 
     if (filters.dateFrom) {
-      const fromDate = new Date(filters.dateFrom);
-      fromDate.setHours(0, 0, 0, 0);
       filtered = filtered.filter((receipt) => {
-        const receiptDate = new Date(receipt.timestamp);
+        const receiptDate = new Date(receipt.timestamp.split('/').reverse().join('-'));
+        const fromDate = new Date(filters.dateFrom);
         return receiptDate >= fromDate;
       });
     }
 
     if (filters.dateTo) {
-      const toDate = new Date(filters.dateTo);
-      toDate.setHours(23, 59, 59, 999);
       filtered = filtered.filter((receipt) => {
-        const receiptDate = new Date(receipt.timestamp);
+        const receiptDate = new Date(receipt.timestamp.split('/').reverse().join('-'));
+        const toDate = new Date(filters.dateTo);
+        toDate.setHours(23, 59, 59, 999);
         return receiptDate <= toDate;
       });
     }
@@ -107,6 +104,6 @@ export const useReceipts = () => {
     handleArchive,
     handleDelete,
     handleFilterChange,
-    loadReceipts, // Export loadReceipts for manual refresh
+    loadReceipts,
   };
 };

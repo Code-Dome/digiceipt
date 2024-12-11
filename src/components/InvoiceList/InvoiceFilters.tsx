@@ -35,7 +35,6 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     
-    // Convert dates to the format used in receipts for comparison
     const formattedFilters = {
       ...newFilters,
       dateFrom: newFilters.dateFrom ? 
@@ -52,12 +51,6 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
     onFilterChange({ ...filters, ...newCustomFilters });
   };
 
-  const clearDateFilters = () => {
-    const newFilters = { ...filters, dateFrom: "", dateTo: "" };
-    setFilters(newFilters);
-    onFilterChange({ ...newFilters, ...customFilters });
-  };
-
   const clearAllFilters = () => {
     const clearedFilters = {
       invoiceNo: "",
@@ -70,27 +63,27 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
   };
 
   return (
-    <div className="space-y-4 p-4 bg-violet-50 rounded-lg border border-violet-200">
+    <div className="space-y-4 p-4 bg-violet-50 rounded-lg border border-violet-200 dark:bg-gray-800 dark:border-gray-700">
       <div className="grid gap-4 md:grid-cols-4">
         <div className="space-y-2">
-          <Label htmlFor="invoiceNo">Invoice Number</Label>
+          <Label htmlFor="invoiceNo" className="dark:text-gray-300">Invoice Number</Label>
           <Input
             id="invoiceNo"
             value={filters.invoiceNo}
             onChange={(e) => handleFilterChange("invoiceNo", e.target.value)}
             placeholder="Search by invoice number"
-            className="bg-white border-violet-200"
+            className="bg-white border-violet-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="dateFrom">Date From</Label>
+          <Label htmlFor="dateFrom" className="dark:text-gray-300">Date From</Label>
           <div className="relative">
             <Input
               id="dateFrom"
               type="date"
               value={filters.dateFrom}
               onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
-              className="bg-white border-violet-200"
+              className="bg-white border-violet-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
             {filters.dateFrom && (
               <Button
@@ -98,22 +91,22 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
                 variant="ghost"
                 size="icon"
                 onClick={() => handleFilterChange("dateFrom", "")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 hover:bg-violet-100 rounded-full"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 hover:bg-violet-100 rounded-full dark:hover:bg-gray-600"
               >
-                <X className="h-4 w-4 text-violet-700" />
+                <X className="h-4 w-4 text-violet-700 dark:text-violet-400" />
               </Button>
             )}
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="dateTo">Date To</Label>
+          <Label htmlFor="dateTo" className="dark:text-gray-300">Date To</Label>
           <div className="relative">
             <Input
               id="dateTo"
               type="date"
               value={filters.dateTo}
               onChange={(e) => handleFilterChange("dateTo", e.target.value)}
-              className="bg-white border-violet-200"
+              className="bg-white border-violet-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
             {filters.dateTo && (
               <Button
@@ -121,15 +114,15 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
                 variant="ghost"
                 size="icon"
                 onClick={() => handleFilterChange("dateTo", "")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 hover:bg-violet-100 rounded-full"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 hover:bg-violet-100 rounded-full dark:hover:bg-gray-600"
               >
-                <X className="h-4 w-4 text-violet-700" />
+                <X className="h-4 w-4 text-violet-700 dark:text-violet-400" />
               </Button>
             )}
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Custom Fields</Label>
+          <Label className="dark:text-gray-300">Custom Fields</Label>
           <CustomFiltersModal
             availableCustomFields={availableCustomFields}
             customFilters={customFilters}
@@ -137,20 +130,11 @@ export const InvoiceFilters = ({ invoices, onFilterChange }: InvoiceFiltersProps
           />
         </div>
       </div>
-      <div className="flex justify-end gap-2">
-        {(filters.dateFrom || filters.dateTo) && (
-          <Button
-            variant="outline"
-            onClick={clearDateFilters}
-            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
-          >
-            Clear Date Filters
-          </Button>
-        )}
+      <div className="flex justify-end">
         <Button
           variant="outline"
           onClick={clearAllFilters}
-          className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+          className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-violet-400 dark:border-gray-600"
         >
           Clear All Filters
         </Button>

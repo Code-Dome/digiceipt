@@ -30,39 +30,44 @@ export const CompanySettings = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4 bg-white rounded-lg border border-violet-200 dark:bg-gray-800 dark:border-gray-700">
       <div className="space-y-2">
-        <Label htmlFor="companyName">Company Name</Label>
+        <Label htmlFor="companyName" className="dark:text-gray-300">Company Name</Label>
         <Input
           id="companyName"
           value={settings.companyName}
           onChange={(e) => setSettings(prev => ({ ...prev, companyName: e.target.value }))}
           placeholder="Enter company name"
+          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
+        <Label htmlFor="address" className="dark:text-gray-300">Address</Label>
         <Input
           id="address"
           value={settings.address}
           onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
           placeholder="Enter company address"
+          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="termsAndConditions">Terms & Conditions</Label>
+        <Label htmlFor="termsAndConditions" className="dark:text-gray-300">Terms & Conditions</Label>
         <Textarea
           id="termsAndConditions"
           value={settings.termsAndConditions}
           onChange={(e) => setSettings(prev => ({ ...prev, termsAndConditions: e.target.value }))}
           placeholder="Enter terms and conditions"
-          className="min-h-[100px]"
+          className="min-h-[100px] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
         />
       </div>
 
-      <Button onClick={handleSave} className="w-full">
+      <Button 
+        onClick={handleSave} 
+        className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold dark:bg-violet-700 dark:hover:bg-violet-800"
+      >
         Save Settings
       </Button>
     </div>

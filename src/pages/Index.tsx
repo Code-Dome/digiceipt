@@ -12,39 +12,28 @@ const Index = () => {
   return (
     <div className="container py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-violet-700">Digital Receipts</h1>
+        <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-400">Digital Receipts</h1>
         <div className="flex gap-2 items-center">
           <ThemeSwitcher />
           <Button 
             onClick={() => logout()}
             variant="outline"
-            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
           >
             <LogOut className="mr-2 h-4 w-4" /> Logout
           </Button>
         </div>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 mb-8">
         <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">Create Receipt</h2>
           <p className="text-gray-600 dark:text-gray-300 mb-4">Generate a new digital receipt with custom fields and signature.</p>
           <Button 
             onClick={() => navigate("/create")}
-            className="w-full bg-violet-600 hover:bg-violet-700"
+            className="w-full bg-violet-600 hover:bg-violet-700 dark:bg-violet-700 dark:hover:bg-violet-800"
           >
             <Plus className="mr-2 h-4 w-4" /> New Receipt
-          </Button>
-        </div>
-
-        <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow dark:bg-gray-800 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-violet-700 dark:text-violet-400 mb-4">Customize Templates</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Preview and select different receipt templates for your business.</p>
-          <Button 
-            onClick={() => navigate("/templates")}
-            className="w-full bg-violet-600 hover:bg-violet-700"
-          >
-            <FileText className="mr-2 h-4 w-4" /> Manage Templates
           </Button>
         </div>
 
@@ -53,7 +42,7 @@ const Index = () => {
           <p className="text-gray-600 dark:text-gray-300 mb-4">Access and manage all your created digital receipts.</p>
           <Button 
             onClick={() => navigate("/view")}
-            className="w-full bg-violet-600 hover:bg-violet-700"
+            className="w-full bg-violet-600 hover:bg-violet-700 dark:bg-violet-700 dark:hover:bg-violet-800"
           >
             <FileText className="mr-2 h-4 w-4" /> View Receipts
           </Button>
