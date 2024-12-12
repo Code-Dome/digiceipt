@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Receipt } from '@/types/receipt';
 import { useToast } from '@/components/ui/use-toast';
-import { parse, isValid, format } from 'date-fns';
+import { parse, isValid } from 'date-fns';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -26,23 +26,31 @@ export const useReceipts = () => {
     const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
     
     if (!existingArchived) {
+      // Update archived receipts in localStorage
       const updatedArchived = [...archivedReceipts, receipt];
       localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
       
+      // Update active receipts in localStorage and state
       const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
       localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
+      
+      // Update both receipts and filtered receipts states
       setReceipts(updatedReceipts);
-      setFilteredReceipts(updatedReceipts);
+      setFilteredReceipts(prevFiltered => 
+        prevFiltered.filter(r => r.id !== receipt.id)
+      );
       
       toast({
         title: "Receipt archived",
         description: `Invoice #${receipt.invoiceNo} has been archived.`,
+        duration: 2000,
       });
     } else {
       toast({
         title: "Already archived",
         description: `Invoice #${receipt.invoiceNo} is already in the archive.`,
         variant: "destructive",
+        duration: 2000,
       });
     }
   };
@@ -50,12 +58,15 @@ export const useReceipts = () => {
   const handleDelete = (receipt: Receipt) => {
     const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
     setReceipts(updatedReceipts);
-    setFilteredReceipts(updatedReceipts);
+    setFilteredReceipts(prevFiltered => 
+      prevFiltered.filter(r => r.id !== receipt.id)
+    );
     localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
     
     toast({
       title: "Receipt deleted",
       description: `Invoice #${receipt.invoiceNo} has been deleted.`,
+      duration: 2000,
     });
   };
 
