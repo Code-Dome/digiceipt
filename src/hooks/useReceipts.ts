@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Receipt } from '@/types/receipt';
 import { useToast } from '@/components/ui/use-toast';
-import { parse, isValid, format } from 'date-fns';
+import { parse, isValid } from 'date-fns';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [filteredReceipts, setFilteredReceipts] = useState<Receipt[]>([]);
   const { toast } = useToast();
 
-  const loadReceipts = () => {
+  const loadReceipts = useCallback(() => {
     const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]") as Receipt[];
     const uniqueReceipts = Array.from(
       new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
     );
     setReceipts(uniqueReceipts);
     setFilteredReceipts(uniqueReceipts);
-  };
+  }, []);
 
   useEffect(() => {
     loadReceipts();
-  }, [receipts]);
+  }, []); // Remove receipts dependency to prevent infinite loop
 
   const handleArchive = (receipt: Receipt) => {
     const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
@@ -70,7 +70,7 @@ export const useReceipts = () => {
     });
   };
 
-  const handleFilterChange = (filters: Record<string, string>) => {
+  const handleFilterChange = useCallback((filters: Record<string, string>) => {
     let filtered = [...receipts];
 
     if (filters.invoiceNo) {
@@ -89,7 +89,7 @@ export const useReceipts = () => {
           return false;
         }
 
-       if (filters.dateFrom) {
+        if (filters.dateFrom) {
           // Parse the from date which comes in dd/MM/yyyy format
           const fromDate = parse(filters.dateFrom, 'dd/MM/yyyy', new Date());
           if (isValid(fromDate)) {
@@ -128,7 +128,7 @@ export const useReceipts = () => {
     });
 
     setFilteredReceipts(filtered);
-  };
+  }, [receipts]); // Add receipts as dependency since we use it in the filter
 
   return {
     receipts,
