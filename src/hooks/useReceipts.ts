@@ -19,26 +19,24 @@ export const useReceipts = () => {
 
   useEffect(() => {
     loadReceipts();
-  }, []); // Remove receipts dependency to prevent infinite loop
+  }, [loadReceipts]);
 
-  const handleArchive = (receipt: Receipt) => {
+  const handleArchive = useCallback((receipt: Receipt) => {
     const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
     const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
     
     if (!existingArchived) {
-      // Update archived receipts in localStorage
+      // Update archived receipts
       const updatedArchived = [...archivedReceipts, receipt];
       localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
       
-      // Update active receipts in localStorage and state
+      // Update active receipts in localStorage
       const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
       localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
       
-      // Update both receipts and filtered receipts states
+      // Update state
       setReceipts(updatedReceipts);
-      setFilteredReceipts(prevFiltered => 
-        prevFiltered.filter(r => r.id !== receipt.id)
-      );
+      setFilteredReceipts(prev => prev.filter(r => r.id !== receipt.id));
       
       toast({
         title: "Receipt archived",
@@ -53,14 +51,12 @@ export const useReceipts = () => {
         duration: 2000,
       });
     }
-  };
+  }, [receipts, toast]);
 
-  const handleDelete = (receipt: Receipt) => {
+  const handleDelete = useCallback((receipt: Receipt) => {
     const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
     setReceipts(updatedReceipts);
-    setFilteredReceipts(prevFiltered => 
-      prevFiltered.filter(r => r.id !== receipt.id)
-    );
+    setFilteredReceipts(prev => prev.filter(r => r.id !== receipt.id));
     localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
     
     toast({
@@ -68,7 +64,7 @@ export const useReceipts = () => {
       description: `Invoice #${receipt.invoiceNo} has been deleted.`,
       duration: 2000,
     });
-  };
+  }, [receipts, toast]);
 
   const handleFilterChange = useCallback((filters: Record<string, string>) => {
     let filtered = [...receipts];
@@ -81,7 +77,6 @@ export const useReceipts = () => {
 
     if (filters.dateFrom || filters.dateTo) {
       filtered = filtered.filter((receipt) => {
-        // Parse the receipt date from dd/MM/yyyy format
         const receiptDate = parse(receipt.timestamp, 'dd/MM/yyyy', new Date());
         
         if (!isValid(receiptDate)) {
@@ -90,7 +85,6 @@ export const useReceipts = () => {
         }
 
         if (filters.dateFrom) {
-          // Parse the from date which comes in dd/MM/yyyy format
           const fromDate = parse(filters.dateFrom, 'dd/MM/yyyy', new Date());
           if (isValid(fromDate)) {
             fromDate.setHours(0, 0, 0, 0);
@@ -101,7 +95,6 @@ export const useReceipts = () => {
         }
 
         if (filters.dateTo) {
-          // Parse the to date which comes in dd/MM/yyyy format
           const toDate = parse(filters.dateTo, 'dd/MM/yyyy', new Date());
           if (isValid(toDate)) {
             toDate.setHours(23, 59, 59, 999);
@@ -115,7 +108,6 @@ export const useReceipts = () => {
       });
     }
 
-    // Handle custom field filters
     Object.entries(filters).forEach(([key, value]) => {
       if (!["invoiceNo", "dateFrom", "dateTo"].includes(key) && value) {
         filtered = filtered.filter((receipt) => {
@@ -128,7 +120,7 @@ export const useReceipts = () => {
     });
 
     setFilteredReceipts(filtered);
-  }, [receipts]); // Add receipts as dependency since we use it in the filter
+  }, [receipts]);
 
   return {
     receipts,
