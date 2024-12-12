@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Receipt } from '@/types/receipt';
 import { useToast } from '@/components/ui/use-toast';
-import { parse, isValid } from 'date-fns';
+import { parse, isValid, format } from 'date-fns';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -81,20 +81,27 @@ export const useReceipts = () => {
 
     if (filters.dateFrom || filters.dateTo) {
       filtered = filtered.filter((receipt) => {
+        // Parse the receipt date from dd/MM/yyyy format
         const receiptDate = parse(receipt.timestamp, 'dd/MM/yyyy', new Date());
         
         if (!isValid(receiptDate)) {
+          console.log('Invalid receipt date:', receipt.timestamp);
           return false;
         }
 
         if (filters.dateFrom) {
+          // Parse the from date which comes in dd/MM/yyyy format
           const fromDate = parse(filters.dateFrom, 'dd/MM/yyyy', new Date());
-          if (isValid(fromDate) && receiptDate < fromDate) {
-            return false;
+          if (isValid(fromDate)) {
+            fromDate.setHours(0, 0, 0, 0);
+            if (receiptDate < fromDate) {
+              return false;
+            }
           }
         }
 
         if (filters.dateTo) {
+          // Parse the to date which comes in dd/MM/yyyy format
           const toDate = parse(filters.dateTo, 'dd/MM/yyyy', new Date());
           if (isValid(toDate)) {
             toDate.setHours(23, 59, 59, 999);
