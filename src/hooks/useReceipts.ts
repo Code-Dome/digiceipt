@@ -19,7 +19,7 @@ export const useReceipts = () => {
 
   useEffect(() => {
     loadReceipts();
-  }, []);
+  }, [receipts]);
 
   const handleArchive = (receipt: Receipt) => {
     const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
@@ -90,26 +90,21 @@ export const useReceipts = () => {
         }
 
         if (filters.dateFrom) {
-          // Parse the from date which comes in dd/MM/yyyy format
-          const fromDate = parse(filters.dateFrom, 'dd/MM/yyyy', new Date());
-          if (isValid(fromDate)) {
-            fromDate.setHours(0, 0, 0, 0);
-            if (receiptDate < fromDate) {
-              return false;
-            }
-          }
+        const fromDate = new Date(filters.dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+      filtered = filtered.filter((receipt) => {
+  const receiptDate = new Date(receipt.timestamp);
+ return receiptDate >= fromDate;
         }
 
-        if (filters.dateTo) {
-          // Parse the to date which comes in dd/MM/yyyy format
-          const toDate = parse(filters.dateTo, 'dd/MM/yyyy', new Date());
-          if (isValid(toDate)) {
-            toDate.setHours(23, 59, 59, 999);
-            if (receiptDate > toDate) {
-              return false;
-            }
-          }
-        }
+       if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((receipt) => {
+        const receiptDate = new Date(receipt.timestamp);
+        return receiptDate <= toDate;
+      });
+    }
 
         return true;
       });
