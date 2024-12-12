@@ -23,7 +23,7 @@ const Archive = () => {
 
   useEffect(() => {
     loadArchivedReceipts();
-  }, []);
+  }, [archivedReceipts]);
 
   const handleUnarchive = (receipt: Receipt) => {
     const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
