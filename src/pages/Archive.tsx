@@ -41,6 +41,7 @@ const Archive = () => {
       
       // Refresh the active receipts list
       loadReceipts();
+      loadArchivedReceipts();
       
       toast({
         title: "Receipt restored",
