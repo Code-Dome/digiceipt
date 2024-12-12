@@ -13,13 +13,15 @@ export const useReceipts = () => {
     const uniqueReceipts = Array.from(
       new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
     );
+    if (receipts === uniqueReceipts) return
+    
     setReceipts(uniqueReceipts);
     setFilteredReceipts(uniqueReceipts);
   }, []);
 
   useEffect(() => {
     loadReceipts();
-  }, [loadReceipts]);
+  }, [receipts]);
 
   const handleArchive = useCallback((receipt: Receipt) => {
     const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
