@@ -19,9 +19,9 @@ export const useReceipts = () => {
 
   useEffect(() => {
     loadReceipts();
-  }, [loadReceipts]);
+  }, []);
 
-  const handleArchive = useCallback((receipt: Receipt) => {
+  const handleArchive = (receipt: Receipt) => {
   const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
   const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
   
@@ -48,7 +48,7 @@ export const useReceipts = () => {
       duration: 2000,
     });
   }
-}, [receipts, filteredReceipts, toast]);
+};
 
   const handleDelete = useCallback((receipt: Receipt) => {
     const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
