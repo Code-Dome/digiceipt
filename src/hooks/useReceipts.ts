@@ -23,11 +23,7 @@ export const useReceipts = () => {
 
   const handleArchive = (receipt: Receipt) => {
   const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
-  const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
-    console.log(archivedReceipts)
-    console.log(existingArchived)
-  
-  if (!existingArchived) {
+
     const updatedArchived = [...archivedReceipts, receipt];
     localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
     
@@ -41,14 +37,6 @@ export const useReceipts = () => {
       description: `Invoice #${receipt.invoiceNo} has been archived.`,
       duration: 2000,
     });
-  } else {
-    toast({
-      title: "Already archived",
-      description: `Invoice #${receipt.invoiceNo} is already in the archive.`,
-      variant: "destructive",
-      duration: 2000,
-    });
-  }
 };
 
   const handleDelete = useCallback((receipt: Receipt) => {
