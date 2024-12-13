@@ -13,15 +13,15 @@ export const useReceipts = () => {
     const uniqueReceipts = Array.from(
       new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
     );
-    if (receipts === uniqueReceipts) return
+    if (receipts === uniqueReceipts) return;
     
     setReceipts(uniqueReceipts);
     setFilteredReceipts(uniqueReceipts);
-  }, []);
+  }, [receipts]);
 
   useEffect(() => {
     loadReceipts();
-  }, [receipts]);
+  }, [loadReceipts]);
 
   const handleArchive = useCallback((receipt: Receipt) => {
     const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
@@ -79,7 +79,9 @@ export const useReceipts = () => {
 
     if (filters.dateFrom || filters.dateTo) {
       filtered = filtered.filter((receipt) => {
-        const receiptDate = parse(receipt.timestamp, 'dd/MM/yyyy', new Date());
+        // Extract just the date part from the timestamp (assuming format "dd/MM/yyyy HH:mm:ss")
+        const datePart = receipt.timestamp.split(' ')[0];
+        const receiptDate = parse(datePart, 'dd/MM/yyyy', new Date());
         
         if (!isValid(receiptDate)) {
           console.log('Invalid receipt date:', receipt.timestamp);
