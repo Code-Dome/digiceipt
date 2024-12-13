@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import ReceiptForm from "@/components/ReceiptForm";
 import { Button } from "@/components/ui/button";
 import { Plus, Archive, Printer, Download, Home, Settings } from "lucide-react";
-import { CompanySettings } from "@/components/CompanySettings";
 import { useReceipts } from "@/hooks/useReceipts";
 import { useReceiptActions } from "@/hooks/useReceiptActions";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -81,9 +80,7 @@ const View = () => {
         </div>
       </div>
       
-      <div className="space-y-6">
-        <CompanySettings />
-        
+      <div className="space-y-6">     
         <InvoiceFilters 
           invoices={filteredReceipts}
           onFilterChange={handleFilterChange} 
