@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Receipt } from "@/types/receipt";
 import { format, parse } from "date-fns";
 
-export const WashingStats = () => {
+export const WashingStats: React.FC = () => {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [washTypeData, setWashTypeData] = useState<any[]>([]);
 
