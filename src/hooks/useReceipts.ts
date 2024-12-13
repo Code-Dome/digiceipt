@@ -13,11 +13,10 @@ export const useReceipts = () => {
     const uniqueReceipts = Array.from(
       new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
     );
-    if (receipts === uniqueReceipts) return;
     
     setReceipts(uniqueReceipts);
     setFilteredReceipts(uniqueReceipts);
-  }, [receipts]);
+  }, []);
 
   useEffect(() => {
     loadReceipts();
@@ -79,7 +78,6 @@ export const useReceipts = () => {
 
     if (filters.dateFrom || filters.dateTo) {
       filtered = filtered.filter((receipt) => {
-        // Extract just the date part from the timestamp (assuming format "dd/MM/yyyy HH:mm:ss")
         const datePart = receipt.timestamp.split(' ')[0];
         const receiptDate = parse(datePart, 'dd/MM/yyyy', new Date());
         
