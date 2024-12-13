@@ -13,18 +13,17 @@ const Archive = () => {
   const { toast } = useToast();
   const { loadReceipts } = useReceipts(); // Get loadReceipts from the hook
   
-  const loadArchivedReceipts = useCallback(() => {
+  const loadArchivedReceipts = () => {
   const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
 
   const uniqueReceipts = Array.from(
     new Map(archived.map((receipt) => [receipt.id, receipt])).values()
   );
   setArchivedReceipts(uniqueReceipts);
-}, []); // No dependencies to avoid re-creating the function
-
+}
 useEffect(() => {
   loadArchivedReceipts();
-}, [loadArchivedReceipts]); // Dependency is the stable `loadArchivedReceipts`
+}, []); // Dependency is the stable `loadArchivedReceipts`
 
   const handleUnarchive = (receipt: Receipt) => {
     const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
