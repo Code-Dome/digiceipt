@@ -13,24 +13,22 @@ const Archive = () => {
   const { toast } = useToast();
   const { loadReceipts } = useReceipts(); // Get loadReceipts from the hook
   
-  const loadArchivedReceipts = () => {
+ const loadArchivedReceipts = useCallback(() => {
   const archived = JSON.parse(localStorage.getItem('archivedReceipts') || '[]') as Receipt[];
 
   const uniqueReceipts = Array.from(
     new Map(archived.map((receipt) => [receipt.id, receipt])).values()
   );
   setArchivedReceipts(uniqueReceipts);
-}
+}, []); // No dependencies to avoid re-creating the function
+  
 useEffect(() => {
   loadArchivedReceipts();
-}, []); // Dependency is the stable `loadArchivedReceipts`
+}, [loadArchivedReceipts]); // Dependency is the stable `loadArchivedReceipts`
 
   const handleUnarchive = (receipt: Receipt) => {
-    const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
-    const existingReceipt = activeReceipts.find(r => r.id === receipt.id);
-    
-    if (!existingReceipt) {
-      // Update active receipts
+      const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
+
       const updatedActive = [...activeReceipts, receipt];
       localStorage.setItem('receipts', JSON.stringify(updatedActive));
       
@@ -47,13 +45,6 @@ useEffect(() => {
         title: "Receipt restored",
         description: `Invoice #${receipt.invoiceNo} has been restored to active receipts.`,
       });
-    } else {
-      toast({
-        title: "Receipt already exists",
-        description: `Invoice #${receipt.invoiceNo} is already in active receipts.`,
-        variant: "destructive",
-      });
-    }
   };
 
   const handleDelete = (receipt: Receipt) => {
