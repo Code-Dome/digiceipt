@@ -22,36 +22,33 @@ export const useReceipts = () => {
   }, [loadReceipts]);
 
   const handleArchive = useCallback((receipt: Receipt) => {
-    const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
-    const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
+  const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
+  const existingArchived = archivedReceipts.find(r => r.id === receipt.id);
+  
+  if (!existingArchived) {
+    const updatedArchived = [...archivedReceipts, receipt];
+    localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
     
-    if (!existingArchived) {
-      // Update archived receipts
-      const updatedArchived = [...archivedReceipts, receipt];
-      localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
-      
-      // Update active receipts
-      const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
-      localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
-      
-      // Update state immediately
-      setReceipts(updatedReceipts);
-      setFilteredReceipts(prev => prev.filter(r => r.id !== receipt.id));
-      
-      toast({
-        title: "Receipt archived",
-        description: `Invoice #${receipt.invoiceNo} has been archived.`,
-        duration: 2000,
-      });
-    } else {
-      toast({
-        title: "Already archived",
-        description: `Invoice #${receipt.invoiceNo} is already in the archive.`,
-        variant: "destructive",
-        duration: 2000,
-      });
-    }
-  }, [receipts, toast]);
+    const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
+    localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
+    
+    setReceipts([...updatedReceipts]); // Ensure new reference
+    setFilteredReceipts(filteredReceipts.filter(r => r.id !== receipt.id)); // Ensure filtering is updated
+    
+    toast({
+      title: "Receipt archived",
+      description: `Invoice #${receipt.invoiceNo} has been archived.`,
+      duration: 2000,
+    });
+  } else {
+    toast({
+      title: "Already archived",
+      description: `Invoice #${receipt.invoiceNo} is already in the archive.`,
+      variant: "destructive",
+      duration: 2000,
+    });
+  }
+}, [receipts, filteredReceipts, toast]);
 
   const handleDelete = useCallback((receipt: Receipt) => {
     const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
