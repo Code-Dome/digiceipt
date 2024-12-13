@@ -13,7 +13,6 @@ export const useReceipts = () => {
     const uniqueReceipts = Array.from(
       new Map(savedReceipts.map(receipt => [receipt.id, receipt])).values()
     );
-    
     setReceipts(uniqueReceipts);
     setFilteredReceipts(uniqueReceipts);
   }, []);
@@ -31,11 +30,11 @@ export const useReceipts = () => {
       const updatedArchived = [...archivedReceipts, receipt];
       localStorage.setItem("archivedReceipts", JSON.stringify(updatedArchived));
       
-      // Update active receipts in localStorage
+      // Update active receipts
       const updatedReceipts = receipts.filter(r => r.id !== receipt.id);
       localStorage.setItem("receipts", JSON.stringify(updatedReceipts));
       
-      // Update state
+      // Update state immediately
       setReceipts(updatedReceipts);
       setFilteredReceipts(prev => prev.filter(r => r.id !== receipt.id));
       

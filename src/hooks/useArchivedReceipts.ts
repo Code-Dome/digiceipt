@@ -29,7 +29,7 @@ export const useArchivedReceipts = () => {
     const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
     localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
     
-    // Update state
+    // Update state immediately
     setArchivedReceipts(updatedArchived);
     
     toast({
