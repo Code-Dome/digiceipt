@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+limport { useState, useEffect, useCallback } from "react";
 import { Receipt } from "@/types/receipt";
 import { InvoiceTable } from "@/components/InvoiceList/InvoiceTable";
 import { Button } from "@/components/ui/button";
