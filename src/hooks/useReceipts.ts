@@ -34,7 +34,7 @@ export const useReceipts = () => {
     
     setReceipts([...updatedReceipts]); // Ensure new reference
     setFilteredReceipts(filteredReceipts.filter(r => r.id !== receipt.id)); // Ensure filtering is updated
-    
+    console.log(updatedReceipts)
     toast({
       title: "Receipt archived",
       description: `Invoice #${receipt.invoiceNo} has been archived.`,
