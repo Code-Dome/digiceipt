@@ -4,6 +4,13 @@ import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 import { Receipt } from "@/types/receipt";
 import { CompanySelect } from "./ReceiptForm/CompanySelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DefaultFieldsProps {
   fields: { key: string; label: string }[];
@@ -43,6 +50,20 @@ export const DefaultFields = ({
                   value={values[key]}
                   onChange={(value) => onInputChange(key, value)}
                 />
+              ) : key === "washType" ? (
+                <Select
+                  value={values[key]}
+                  onValueChange={(value) => onInputChange(key, value)}
+                >
+                  <SelectTrigger className="bg-white dark:bg-gray-800">
+                    <SelectValue placeholder="Select wash type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Side Tipper">Side Tipper</SelectItem>
+                    <SelectItem value="Full Wash">Full Wash</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               ) : (
                 <Input
                   id={key}
