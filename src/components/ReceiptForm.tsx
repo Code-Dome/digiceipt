@@ -19,18 +19,7 @@ import { SignaturePad } from "./SignaturePad";
 import { DefaultFields } from "./DefaultFields";
 import { RestoreFields } from "./RestoreFields";
 import { useToast } from "@/hooks/use-toast";
-
-interface ReceiptFormProps {
-  initialData?: Receipt;
-  onSave: (receipt: Receipt) => void;
-  onUpdate: (receipt: Receipt) => void;
-}
-
-const defaultFields = [
-  { key: "driverName", label: "Driver Name" },
-  { key: "horseReg", label: "Horse Registration" },
-  { key: "companyName", label: "Company Name" },
-];
+import { defaultFields } from "./ReceiptForm/FieldTypes";
 
 const generateUniqueInvoiceNo = () => {
   const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
@@ -45,7 +34,11 @@ const generateUniqueInvoiceNo = () => {
   return invoiceNo;
 };
 
-const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
+const ReceiptForm = ({ initialData, onSave, onUpdate }: { 
+  initialData?: Receipt;
+  onSave: (receipt: Receipt) => void;
+  onUpdate: (receipt: Receipt) => void;
+}) => {
   const [receipt, setReceipt] = useState<Receipt>(() => ({
     id: initialData?.id || uuidv4(),
     invoiceNo: initialData?.invoiceNo || generateUniqueInvoiceNo(),
@@ -67,15 +60,9 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
 
   const handleInputChange = (field: keyof Receipt, value: string) => {
     setReceipt((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleWashTypeChange = (value: string) => {
-    setShowOtherWashType(value === "Other");
-    setReceipt((prev) => ({
-      ...prev,
-      washType: value,
-      otherWashType: value !== "Other" ? "" : prev.otherWashType,
-    }));
+    if (field === "washType") {
+      setShowOtherWashType(value === "Other");
+    }
   };
 
   const addCustomField = (type: FieldType) => {
@@ -154,7 +141,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
   return (
     <Card className="w-full">
       <CardContent className="p-6">
-        <div className="space-y-8"> {/* Increased spacing from space-y-6 to space-y-8 */}
+        <div className="space-y-8">
           <div className="flex justify-between">
             <div>
               <p className="font-semibold text-violet-700">Invoice #{receipt.invoiceNo}</p>
@@ -162,7 +149,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
             </div>
           </div>
 
-          <div className="grid gap-6"> {/* Increased gap from gap-4 to gap-6 */}
+          <div className="grid gap-6">
             <DefaultFields
               fields={defaultFields}
               values={receipt}
@@ -179,24 +166,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: ReceiptFormProps) => {
               onRestoreCustomField={restoreCustomField}
             />
 
-            <div className="grid gap-4 pt-4"> {/* Added pt-4 for extra padding top */}
-              <Label htmlFor="washType">Wash Type</Label>
-              <Select
-                value={receipt.washType}
-                onValueChange={handleWashTypeChange}
-              >
-                <SelectTrigger className="bg-white">
-                  <SelectValue placeholder="Select wash type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Side Tipper">Side Tipper</SelectItem>
-                  <SelectItem value="Full Wash">Full Wash</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {showOtherWashType && (
+            {showOtherWashType && !receipt.removedFields?.includes('washType') && (
               <div className="grid gap-2">
                 <Label htmlFor="otherWashType">Specify Other Wash Type</Label>
                 <Input
