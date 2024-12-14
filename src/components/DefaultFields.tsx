@@ -11,14 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface DefaultFieldsProps {
-  fields: { key: string; label: string }[];
-  values: Receipt;
-  removedFields: string[];
-  onInputChange: (field: string, value: string) => void;
-  onRemoveField: (field: string) => void;
-}
+import { DefaultFieldsProps } from "./ReceiptForm/FieldTypes";
 
 export const DefaultFields = ({
   fields,
@@ -50,7 +43,7 @@ export const DefaultFields = ({
                   value={values[key]}
                   onChange={(value) => onInputChange(key, value)}
                 />
-              ) : key === "washType" ? (
+              ) : key === "washType" && !removedFields.includes("washType") ? (
                 <Select
                   value={values[key]}
                   onValueChange={(value) => onInputChange(key, value)}
