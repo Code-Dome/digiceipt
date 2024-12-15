@@ -6,13 +6,6 @@ import { Receipt, CustomField, FieldType } from "@/types/receipt";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { CustomFieldInput } from "./CustomFieldInput";
 import { SignaturePad } from "./SignaturePad";
@@ -42,7 +35,8 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
   const [receipt, setReceipt] = useState<Receipt>(() => ({
     id: initialData?.id || uuidv4(),
     invoiceNo: initialData?.invoiceNo || generateUniqueInvoiceNo(),
-    timestamp: initialData?.timestamp || format(new Date(), "dd/MM/yyyy HH:mm:ss", { timeZone: "Africa/Johannesburg" }),
+    // Format the timestamp in ISO format for Supabase
+    timestamp: initialData?.timestamp || new Date().toISOString(),
     driverName: initialData?.driverName || "",
     horseReg: initialData?.horseReg || "",
     companyName: initialData?.companyName || "",
@@ -139,13 +133,15 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full dark:bg-gray-800 dark:border-gray-700">
       <CardContent className="p-6">
         <div className="space-y-8">
           <div className="flex justify-between">
             <div>
-              <p className="font-semibold text-violet-700">Invoice #{receipt.invoiceNo}</p>
-              <p className="text-sm text-violet-500">{receipt.timestamp}</p>
+              <p className="font-semibold text-violet-700 dark:text-violet-400">Invoice #{receipt.invoiceNo}</p>
+              <p className="text-sm text-violet-500 dark:text-violet-300">
+                {format(new Date(receipt.timestamp), "dd/MM/yyyy HH:mm:ss", { timeZone: "Africa/Johannesburg" })}
+              </p>
             </div>
           </div>
 
@@ -173,6 +169,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
                   id="otherWashType"
                   value={receipt.otherWashType}
                   onChange={(e) => handleInputChange("otherWashType", e.target.value)}
+                  className="dark:bg-gray-900 dark:border-gray-700 dark:text-white"
                 />
               </div>
             )}
@@ -184,7 +181,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
                   type="button"
                   variant="outline"
                   onClick={() => addCustomField("text")}
-                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-violet-400 dark:border-gray-700"
                 >
                   Add Text Field
                 </Button>
@@ -192,7 +189,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
                   type="button"
                   variant="outline"
                   onClick={() => addCustomField("dropdown")}
-                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-violet-400 dark:border-gray-700"
                 >
                   Add Dropdown
                 </Button>
@@ -200,7 +197,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
                   type="button"
                   variant="outline"
                   onClick={() => addCustomField("checkbox")}
-                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200"
+                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-violet-400 dark:border-gray-700"
                 >
                   Add Checkbox
                 </Button>
@@ -227,7 +224,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
 
             <Button 
               onClick={handleSave} 
-              className="mt-4 bg-violet-600 hover:bg-violet-700 text-white"
+              className="mt-4 bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-700 dark:hover:bg-violet-800"
               disabled={hasFieldErrors}
             >
               {initialData?.id ? "Update Receipt" : "Save Receipt"}
