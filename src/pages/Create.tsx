@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { mapReceiptToDatabase } from "@/utils/receiptMapper";
 
 const Create = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Create = () => {
     const { data: existingReceipts, error: fetchError } = await supabase
       .from('receipts')
       .select('invoice_no')
-      .or(`invoice_no.eq.${receipt.invoiceNo}`);
+      .eq('invoice_no', receipt.invoiceNo);
 
     if (fetchError) {
       toast({
@@ -47,12 +48,7 @@ const Create = () => {
 
     const { error: insertError } = await supabase
       .from('receipts')
-      .insert([
-        {
-          ...receipt,
-          user_id: session.user.id,
-        }
-      ]);
+      .insert([mapReceiptToDatabase(receipt, session.user.id)]);
 
     if (insertError) {
       toast({

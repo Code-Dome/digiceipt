@@ -4,6 +4,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { parse, isValid } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { DatabaseReceipt, mapDatabaseToReceipt } from '@/utils/receiptMapper';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -29,8 +30,9 @@ export const useReceipts = () => {
       return;
     }
 
-    setReceipts(data || []);
-    setFilteredReceipts(data || []);
+    const mappedReceipts = (data as DatabaseReceipt[]).map(mapDatabaseToReceipt);
+    setReceipts(mappedReceipts);
+    setFilteredReceipts(mappedReceipts);
   }, [session?.user?.id, toast]);
 
   useEffect(() => {
