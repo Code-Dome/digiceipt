@@ -35,10 +35,10 @@ const isCustomFieldArray = (arr: unknown): arr is CustomField[] => {
   return Array.isArray(arr) && arr.every(isCustomField);
 };
 
-const parseJsonArray = (json: Json | null, defaultValue: any[] = []): any[] => {
-  if (!json) return defaultValue;
+const parseJsonArray = (json: Json | null): unknown[] => {
+  if (!json) return [];
   if (Array.isArray(json)) return json;
-  return defaultValue;
+  return [];
 };
 
 export const mapDatabaseToReceipt = (dbReceipt: DatabaseReceipt): Receipt => {
@@ -72,8 +72,8 @@ export const mapReceiptToDatabase = (receipt: Receipt, userId: string): Omit<Dat
   company_name: receipt.companyName,
   wash_type: receipt.washType,
   other_wash_type: receipt.otherWashType,
-  custom_fields: receipt.customFields as unknown as Json,
+  custom_fields: JSON.parse(JSON.stringify(receipt.customFields)) as Json,
   signature: receipt.signature,
-  removed_fields: receipt.removedFields as unknown as Json,
-  removed_custom_fields: receipt.removedCustomFields as unknown as Json,
+  removed_fields: JSON.parse(JSON.stringify(receipt.removedFields)) as Json,
+  removed_custom_fields: JSON.parse(JSON.stringify(receipt.removedCustomFields)) as Json,
 });

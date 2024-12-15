@@ -36,7 +36,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     --primary: 261 83% 58%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 261 40% 50%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -114,14 +114,14 @@
   }
 
   .card-hover {
-    @apply hover:shadow-lg transition-shadow duration-200;
+    @apply hover:shadow-lg transition-shadow duration-200 dark:hover:shadow-primary/5;
   }
 
   .input-field {
-    @apply bg-background border border-input focus:border-primary focus:ring-1 focus:ring-primary;
+    @apply bg-background border border-input focus:border-primary focus:ring-1 focus:ring-primary dark:bg-gray-900;
   }
 }
 
 .signature-pad {
-  @apply w-full h-40 border border-input rounded-lg touch-none bg-background shadow-sm;
+  @apply w-full h-40 border border-input rounded-lg touch-none bg-background shadow-sm dark:bg-gray-900;
 }
