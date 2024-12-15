@@ -2,13 +2,20 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Receipt } from "@/types/receipt";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { useTheme } from "@/contexts/ThemeContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { mapDatabaseToReceipt } from "@/utils/receiptMapper";
+import { DatabaseReceipt } from "@/types/database";
+import { useToast } from "./ui/use-toast";
 
 export const WashingStats: React.FC = () => {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [washTypeData, setWashTypeData] = useState<any[]>([]);
   const { theme } = useTheme();
+  const { session } = useAuth();
+  const { toast } = useToast();
 
   // Determine colors based on theme
   const chartColors = {
@@ -18,51 +25,76 @@ export const WashingStats: React.FC = () => {
   };
 
   useEffect(() => {
-    const receipts: Receipt[] = JSON.parse(localStorage.getItem("receipts") || "[]");
-    
-    // Process monthly data
-    const monthlyStats = receipts.reduce((acc: Record<string, number>, receipt) => {
+    const fetchStats = async () => {
+      if (!session?.user?.id) return;
+
       try {
-        const [day, month, year] = receipt.timestamp.split('/');
-        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-        
-        if (!isNaN(date.getTime())) {
-          const monthYear = format(date, 'MMM yyyy');
-          acc[monthYear] = (acc[monthYear] || 0) + 1;
+        const { data, error } = await supabase
+          .from('receipts')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error loading receipts:', error);
+          toast({
+            title: 'Error loading statistics',
+            description: error.message,
+            variant: 'destructive',
+          });
+          return;
         }
+
+        const receipts = (data as DatabaseReceipt[]).map(mapDatabaseToReceipt);
+        
+        // Process monthly data
+        const monthlyStats = receipts.reduce((acc: Record<string, number>, receipt) => {
+          const date = new Date(receipt.timestamp);
+          if (!isNaN(date.getTime())) {
+            const monthYear = format(date, 'MMM yyyy');
+            acc[monthYear] = (acc[monthYear] || 0) + 1;
+          }
+          return acc;
+        }, {});
+
+        const monthlyChartData = Object.entries(monthlyStats)
+          .map(([month, count]) => ({
+            month,
+            count,
+          }))
+          .sort((a, b) => {
+            const dateA = new Date(a.month);
+            const dateB = new Date(b.month);
+            return dateA.getTime() - dateB.getTime();
+          });
+
+        // Process wash type data
+        const washTypeStats = receipts.reduce((acc: Record<string, number>, receipt) => {
+          const type = receipt.washType || 'Unknown';
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;
+        }, {});
+
+        const washTypeChartData = Object.entries(washTypeStats)
+          .map(([type, count]) => ({
+            type: type || 'Unknown',
+            count,
+          }))
+          .sort((a, b) => b.count - a.count);
+
+        setMonthlyData(monthlyChartData);
+        setWashTypeData(washTypeChartData);
       } catch (error) {
-        console.error('Error processing date:', receipt.timestamp);
+        console.error('Error processing stats:', error);
+        toast({
+          title: 'Error processing statistics',
+          description: 'Failed to process receipt statistics',
+          variant: 'destructive',
+        });
       }
-      return acc;
-    }, {});
+    };
 
-    const monthlyChartData = Object.entries(monthlyStats)
-      .map(([month, count]) => ({
-        month,
-        count,
-      }))
-      .sort((a, b) => {
-        const parseMonth = (str: string) => parse(str, 'MMM yyyy', new Date());
-        return parseMonth(a.month).getTime() - parseMonth(b.month).getTime();
-      });
-
-    // Process wash type data
-    const washTypeStats = receipts.reduce((acc: Record<string, number>, receipt) => {
-      const type = receipt.washType || 'Unknown';
-      acc[type] = (acc[type] || 0) + 1;
-      return acc;
-    }, {});
-
-    const washTypeChartData = Object.entries(washTypeStats)
-      .map(([type, count]) => ({
-        type: type || 'Unknown',
-        count,
-      }))
-      .sort((a, b) => b.count - a.count);
-
-    setMonthlyData(monthlyChartData);
-    setWashTypeData(washTypeChartData);
-  }, []);
+    fetchStats();
+  }, [session?.user?.id, toast]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
