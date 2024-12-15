@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Receipt } from '@/types/receipt';
+import { DatabaseReceipt } from '@/types/database';
 import { useToast } from '@/components/ui/use-toast';
 import { parse, isValid } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { DatabaseReceipt, mapDatabaseToReceipt } from '@/utils/receiptMapper';
+import { mapDatabaseToReceipt } from '@/utils/receiptMapper';
 
 export const useReceipts = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
