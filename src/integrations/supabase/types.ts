@@ -9,7 +9,84 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      receipts: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          custom_fields: Json | null
+          driver_name: string | null
+          horse_reg: string | null
+          id: string
+          invoice_no: string
+          other_wash_type: string | null
+          removed_custom_fields: Json | null
+          removed_fields: Json | null
+          signature: string | null
+          timestamp: string
+          updated_at: string
+          user_id: string
+          wash_type: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          custom_fields?: Json | null
+          driver_name?: string | null
+          horse_reg?: string | null
+          id?: string
+          invoice_no: string
+          other_wash_type?: string | null
+          removed_custom_fields?: Json | null
+          removed_fields?: Json | null
+          signature?: string | null
+          timestamp?: string
+          updated_at?: string
+          user_id: string
+          wash_type?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          custom_fields?: Json | null
+          driver_name?: string | null
+          horse_reg?: string | null
+          id?: string
+          invoice_no?: string
+          other_wash_type?: string | null
+          removed_custom_fields?: Json | null
+          removed_fields?: Json | null
+          signature?: string | null
+          timestamp?: string
+          updated_at?: string
+          user_id?: string
+          wash_type?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
