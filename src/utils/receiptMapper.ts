@@ -19,20 +19,48 @@ export interface DatabaseReceipt {
   updated_at: string;
 }
 
-export const mapDatabaseToReceipt = (dbReceipt: DatabaseReceipt): Receipt => ({
-  id: dbReceipt.id,
-  invoiceNo: dbReceipt.invoice_no,
-  timestamp: dbReceipt.timestamp,
-  driverName: dbReceipt.driver_name || "",
-  horseReg: dbReceipt.horse_reg || "",
-  companyName: dbReceipt.company_name || "",
-  washType: dbReceipt.wash_type || "",
-  otherWashType: dbReceipt.other_wash_type || "",
-  customFields: (dbReceipt.custom_fields as CustomField[]) || [],
-  signature: dbReceipt.signature || "",
-  removedFields: (dbReceipt.removed_fields as string[]) || [],
-  removedCustomFields: (dbReceipt.removed_custom_fields as CustomField[]) || [],
-});
+const isCustomField = (field: unknown): field is CustomField => {
+  if (typeof field !== 'object' || field === null) return false;
+  const f = field as any;
+  return (
+    typeof f.id === 'string' &&
+    typeof f.type === 'string' &&
+    typeof f.label === 'string' &&
+    typeof f.value === 'string' &&
+    (f.options === undefined || Array.isArray(f.options))
+  );
+};
+
+const isCustomFieldArray = (arr: unknown): arr is CustomField[] => {
+  return Array.isArray(arr) && arr.every(isCustomField);
+};
+
+const parseJsonArray = (json: Json | null, defaultValue: any[] = []): any[] => {
+  if (!json) return defaultValue;
+  if (Array.isArray(json)) return json;
+  return defaultValue;
+};
+
+export const mapDatabaseToReceipt = (dbReceipt: DatabaseReceipt): Receipt => {
+  const customFields = parseJsonArray(dbReceipt.custom_fields);
+  const removedFields = parseJsonArray(dbReceipt.removed_fields);
+  const removedCustomFields = parseJsonArray(dbReceipt.removed_custom_fields);
+
+  return {
+    id: dbReceipt.id,
+    invoiceNo: dbReceipt.invoice_no,
+    timestamp: dbReceipt.timestamp,
+    driverName: dbReceipt.driver_name || "",
+    horseReg: dbReceipt.horse_reg || "",
+    companyName: dbReceipt.company_name || "",
+    washType: dbReceipt.wash_type || "",
+    otherWashType: dbReceipt.other_wash_type || "",
+    customFields: isCustomFieldArray(customFields) ? customFields : [],
+    signature: dbReceipt.signature || "",
+    removedFields: Array.isArray(removedFields) ? removedFields.filter((f): f is string => typeof f === 'string') : [],
+    removedCustomFields: isCustomFieldArray(removedCustomFields) ? removedCustomFields : [],
+  };
+};
 
 export const mapReceiptToDatabase = (receipt: Receipt, userId: string): Omit<DatabaseReceipt, 'created_at' | 'updated_at'> => ({
   id: receipt.id,
@@ -44,8 +72,8 @@ export const mapReceiptToDatabase = (receipt: Receipt, userId: string): Omit<Dat
   company_name: receipt.companyName,
   wash_type: receipt.washType,
   other_wash_type: receipt.otherWashType,
-  custom_fields: receipt.customFields as Json,
+  custom_fields: receipt.customFields as unknown as Json,
   signature: receipt.signature,
-  removed_fields: receipt.removedFields as Json,
-  removed_custom_fields: receipt.removedCustomFields as Json,
+  removed_fields: receipt.removedFields as unknown as Json,
+  removed_custom_fields: receipt.removedCustomFields as unknown as Json,
 });
