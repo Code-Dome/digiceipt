@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { format } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
+import { parseISO } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import { Receipt, CustomField, FieldType } from "@/types/receipt";
 import { Input } from "@/components/ui/input";
@@ -35,7 +36,6 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
   const [receipt, setReceipt] = useState<Receipt>(() => ({
     id: initialData?.id || uuidv4(),
     invoiceNo: initialData?.invoiceNo || generateUniqueInvoiceNo(),
-    // Format the timestamp in ISO format for Supabase
     timestamp: initialData?.timestamp || new Date().toISOString(),
     driverName: initialData?.driverName || "",
     horseReg: initialData?.horseReg || "",
@@ -47,6 +47,19 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
     removedFields: initialData?.removedFields || [],
     removedCustomFields: initialData?.removedCustomFields || [],
   }));
+
+  const formatDate = (dateString: string) => {
+    try {
+      return formatInTimeZone(
+        parseISO(dateString),
+        'Africa/Johannesburg',
+        'dd/MM/yyyy HH:mm:ss'
+      );
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString;
+    }
+  };
 
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [showOtherWashType, setShowOtherWashType] = useState(receipt.washType === "Other");
@@ -140,7 +153,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
             <div>
               <p className="font-semibold text-violet-700 dark:text-violet-400">Invoice #{receipt.invoiceNo}</p>
               <p className="text-sm text-violet-500 dark:text-violet-300">
-                {format(new Date(receipt.timestamp), "dd/MM/yyyy HH:mm:ss", { timeZone: "Africa/Johannesburg" })}
+                {formatDate(receipt.timestamp)}
               </p>
             </div>
           </div>

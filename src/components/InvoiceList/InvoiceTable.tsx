@@ -18,6 +18,8 @@ import {
   downloadReceipt 
 } from "@/utils/receiptActions";
 import { useToast } from "@/components/ui/use-toast";
+import { format, parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +51,19 @@ export const InvoiceTable = ({
 }: InvoiceTableProps) => {
   const { toast } = useToast();
   
+  const formatDate = (dateString: string) => {
+    try {
+      return formatInTimeZone(
+        parseISO(dateString),
+        'Africa/Johannesburg',
+        'dd/MM/yyyy HH:mm:ss'
+      );
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateString;
+    }
+  };
+
   const customFieldLabels = useMemo(() => {
     const labels = new Set<string>();
     invoices.forEach(invoice => {
@@ -117,7 +132,7 @@ export const InvoiceTable = ({
           {invoices.map((invoice) => (
             <TableRow key={invoice.id}>
               <TableCell className="font-medium">{invoice.invoiceNo}</TableCell>
-              <TableCell>{invoice.timestamp}</TableCell>
+              <TableCell>{formatDate(invoice.timestamp)}</TableCell>
               <TableCell>{invoice.driverName}</TableCell>
               <TableCell>{invoice.companyName}</TableCell>
               <TableCell>{invoice.washType}</TableCell>
