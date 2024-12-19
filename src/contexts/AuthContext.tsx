@@ -19,19 +19,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const navigate = useNavigate();
 
+  const checkAdminStatus = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error checking admin status:', error);
+      return false;
+    }
+
+    return data?.is_admin || false;
+  };
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setIsAuthenticated(!!session);
-      setIsAdmin(session?.user?.email === 'admin@example.com'); // You can customize this logic
+      if (session?.user) {
+        const isAdminUser = await checkAdminStatus(session.user.id);
+        setIsAdmin(isAdminUser);
+      }
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setIsAuthenticated(!!session);
-      setIsAdmin(session?.user?.email === 'admin@example.com'); // You can customize this logic
+      if (session?.user) {
+        const isAdminUser = await checkAdminStatus(session.user.id);
+        setIsAdmin(isAdminUser);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     return () => subscription.unsubscribe();
