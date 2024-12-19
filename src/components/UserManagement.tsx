@@ -12,12 +12,17 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { Shield, User } from "lucide-react";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface Profile {
   id: string;
   username: string | null;
   is_admin: boolean;
   email?: string;
+}
+
+interface AdminUsersResponse {
+  users: SupabaseUser[];
 }
 
 export const UserManagement = () => {
@@ -40,7 +45,7 @@ export const UserManagement = () => {
     }
 
     // Get emails from auth.users (only available to admin users through RLS)
-    const { data: authUsers } = await supabase.auth.admin.listUsers();
+    const { data: authUsers } = await supabase.auth.admin.listUsers() as { data: AdminUsersResponse | null };
     
     const usersWithEmail = profiles.map((profile) => ({
       ...profile,
