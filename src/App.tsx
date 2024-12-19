@@ -8,6 +8,7 @@ import Login from "@/pages/Login";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PostHogProvider } from "@/contexts/PostHogContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Footer } from "@/components/Footer";
 
@@ -16,48 +17,50 @@ function App() {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <div className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/create"
-                  element={
-                    <ProtectedRoute>
-                      <Create />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/view"
-                  element={
-                    <ProtectedRoute>
-                      <View />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/archive"
-                  element={
-                    <ProtectedRoute>
-                      <Archive />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <Admin />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
+          <PostHogProvider>
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/create"
+                    element={
+                      <ProtectedRoute>
+                        <Create />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/view"
+                    element={
+                      <ProtectedRoute>
+                        <View />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/archive"
+                    element={
+                      <ProtectedRoute>
+                        <Archive />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute>
+                        <Admin />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </div>
+              <Footer />
             </div>
-            <Footer />
-          </div>
-          <Toaster />
+            <Toaster />
+          </PostHogProvider>
         </AuthProvider>
       </ThemeProvider>
     </Router>
