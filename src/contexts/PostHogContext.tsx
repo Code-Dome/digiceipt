@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, ReactNode } from 'react';
 import posthog from 'posthog-js';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const PostHogContext = createContext<typeof posthog | null>(null);
 
@@ -15,6 +16,7 @@ export const usePostHog = () => {
 
 export const PostHogProvider = ({ children }: { children: ReactNode }) => {
   const { session } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     const initPostHog = async () => {
@@ -23,10 +25,27 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
           .from('secrets')
           .select('value')
           .eq('name', 'POSTHOG_API_KEY')
-          .single();
+          .maybeSingle();
 
-        if (error) throw error;
-        if (!data?.value) throw new Error('PostHog API key not found');
+        if (error) {
+          console.error('Error fetching PostHog API key:', error);
+          toast({
+            title: "Error initializing analytics",
+            description: "Could not fetch PostHog API key. Some features may be limited.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (!data?.value) {
+          console.log('PostHog API key not found');
+          toast({
+            title: "Analytics not configured",
+            description: "PostHog API key is not set. Some features may be limited.",
+            variant: "destructive",
+          });
+          return;
+        }
 
         posthog.init(data.value, {
           api_host: 'https://app.posthog.com',
@@ -39,6 +58,11 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
         });
       } catch (error) {
         console.error('Error initializing PostHog:', error);
+        toast({
+          title: "Error initializing analytics",
+          description: "An unexpected error occurred. Some features may be limited.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -47,7 +71,7 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       posthog.reset();
     };
-  }, []);
+  }, [toast]);
 
   // Identify user when session changes
   useEffect(() => {
