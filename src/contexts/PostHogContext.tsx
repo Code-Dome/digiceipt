@@ -19,15 +19,16 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initPostHog = async () => {
       try {
-        const { data: { secret }, error } = await supabase
+        const { data, error } = await supabase
           .from('secrets')
           .select('value')
           .eq('name', 'POSTHOG_API_KEY')
           .single();
 
         if (error) throw error;
+        if (!data?.value) throw new Error('PostHog API key not found');
 
-        posthog.init(secret, {
+        posthog.init(data.value, {
           api_host: 'https://app.posthog.com',
           loaded: (posthog) => {
             if (process.env.NODE_ENV === 'development') {
@@ -44,7 +45,7 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
     initPostHog();
 
     return () => {
-      posthog.shutdown();
+      posthog.reset();
     };
   }, []);
 
