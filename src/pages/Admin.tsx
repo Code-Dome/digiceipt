@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCompanyManagement } from "@/hooks/useCompanyManagement";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { CompanySettings } from "@/components/CompanySettings";
+import { UserManagement } from "@/components/UserManagement";
 import { X, ArrowLeft } from "lucide-react";
 
 const Admin = () => {
@@ -70,6 +71,7 @@ const Admin = () => {
       <Tabs defaultValue="companies" className="space-y-6">
         <TabsList className="bg-violet-50 dark:bg-gray-800">
           <TabsTrigger value="companies">Company Management</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="settings">Company Settings</TabsTrigger>
         </TabsList>
 
@@ -119,6 +121,10 @@ const Admin = () => {
               ))}
             </div>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="users">
+          <UserManagement />
         </TabsContent>
 
         <TabsContent value="settings">
