@@ -18,7 +18,6 @@ const View = () => {
     <h1 className="text-3xl font-bold mb-8 text-violet-700 dark:text-violet-400">
         View Receipts
       </h1>
-      </div>
       <InvoiceTable 
         invoices={[]} 
         onEdit={() => {}} 
