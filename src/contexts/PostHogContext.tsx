@@ -21,6 +21,7 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initPostHog = async () => {
       try {
+        console.log('Fetching PostHog API key from Supabase...');
         const { data, error } = await supabase
           .from('secrets')
           .select('value')
@@ -38,7 +39,7 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (!data?.value) {
-          console.log('PostHog API key not found');
+          console.error('PostHog API key not found in secrets table');
           toast({
             title: "Analytics not configured",
             description: "PostHog API key is not set. Some features may be limited.",
@@ -47,11 +48,12 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
+        console.log('PostHog API key found, initializing PostHog...');
         posthog.init(data.value, {
           api_host: 'https://app.posthog.com',
           loaded: (posthog) => {
+            console.log('PostHog initialized successfully');
             if (process.env.NODE_ENV === 'development') {
-              // In development, let's be verbose
               posthog.debug();
             }
           },
