@@ -17,7 +17,6 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Listen for auth events
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
