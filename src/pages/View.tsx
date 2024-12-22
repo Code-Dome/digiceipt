@@ -14,22 +14,6 @@ const View = () => {
   }, [posthog]);
 
   return (
-   import { useEffect } from "react";
-import { InvoiceTable } from "@/components/InvoiceList/InvoiceTable";
-import { usePostHog } from "@/contexts/PostHogContext";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
-const View = () => {
-  const posthog = usePostHog();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    posthog.capture("view_page_visited");
-  }, [posthog]);
-
-  return (
     <div className="container py-8">
       <div className="flex items-center gap-4 mb-8">
         <Button
