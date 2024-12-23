@@ -75,15 +75,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
+    // First clear the local state
+    setIsAuthenticated(false);
+    setIsAdmin(false);
+    setSession(null);
+
     try {
+      // Then sign out from Supabase
       await supabase.auth.signOut();
-      setIsAuthenticated(false);
-      setIsAdmin(false);
-      setSession(null);
+      
+      // Finally navigate to login page
       navigate('/login', { replace: true });
     } catch (error) {
       console.error('Error during logout:', error);
-      throw error;
+      // Even if there's an error, we want to ensure the user is logged out locally
+      navigate('/login', { replace: true });
     }
   };
 
