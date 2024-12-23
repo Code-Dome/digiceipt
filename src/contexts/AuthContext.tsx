@@ -20,18 +20,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   const checkAdminStatus = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', userId)
+        .single();
 
-    if (error) {
-      console.error('Error checking admin status:', error);
+      if (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
+
+      return data?.is_admin || false;
+    } catch (error) {
+      console.error('Error in checkAdminStatus:', error);
       return false;
     }
-
-    return data?.is_admin || false;
   };
 
   useEffect(() => {
@@ -75,21 +80,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
-    // First clear the local state
-    setIsAuthenticated(false);
-    setIsAdmin(false);
-    setSession(null);
-
     try {
-      // Then sign out from Supabase
       await supabase.auth.signOut();
-      
-      // Finally navigate to login page
-      navigate('/login', { replace: true });
+      setIsAuthenticated(false);
+      setIsAdmin(false);
+      setSession(null);
+      navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
-      // Even if there's an error, we want to ensure the user is logged out locally
-      navigate('/login', { replace: true });
+      // Even if there's an error, ensure the user is logged out locally
+      setIsAuthenticated(false);
+      setIsAdmin(false);
+      setSession(null);
+      navigate('/login');
     }
   };
 

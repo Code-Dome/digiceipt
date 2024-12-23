@@ -8,7 +8,7 @@ import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { logout, isAdmin } = useAuth();
+  const { logout, isAdmin, isAuthenticated } = useAuth();
   const posthog = usePostHog();
 
   const handleCreateClick = () => {
@@ -26,10 +26,16 @@ const Index = () => {
     navigate("/admin");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     posthog.capture('user_logged_out');
-    logout();
+    await logout();
+    navigate('/login');
   };
+
+  if (!isAuthenticated) {
+    navigate('/login');
+    return null;
+  }
 
   return (
     <div className="container py-8">
