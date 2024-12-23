@@ -30,7 +30,7 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
           .from('secrets')
           .select('value')
           .eq('name', 'POSTHOG_API_KEY')
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching PostHog API key:', error);
@@ -43,7 +43,7 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (!data?.value) {
-          console.error('PostHog API key not found in secrets table. Data:', data);
+          console.error('PostHog API key not found in secrets table');
           toast({
             title: "Analytics not configured",
             description: "PostHog API key is not set. Some features may be limited.",
