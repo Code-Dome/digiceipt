@@ -12,11 +12,17 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { Shield, User } from "lucide-react";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface Profile {
   id: string;
   username: string | null;
   is_admin: boolean;
+  email?: string;
+}
+
+interface AdminUsersResponse {
+  users: SupabaseUser[];
 }
 
 export const UserManagement = () => {
@@ -38,7 +44,15 @@ export const UserManagement = () => {
       return;
     }
 
-    setUsers(profiles || []);
+    // Get emails from auth.users (only available to admin users through RLS)
+    const { data: authUsers } = await supabase.auth.admin.listUsers() as { data: AdminUsersResponse | null };
+    
+    const usersWithEmail = profiles.map((profile) => ({
+      ...profile,
+      email: authUsers?.users.find((u) => u.id === profile.id)?.email || "",
+    }));
+
+    setUsers(usersWithEmail);
   };
 
   useEffect(() => {
@@ -82,6 +96,7 @@ export const UserManagement = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Username</TableHead>
+            <TableHead>Email</TableHead>
             <TableHead>Admin Role</TableHead>
           </TableRow>
         </TableHeader>
@@ -89,6 +104,7 @@ export const UserManagement = () => {
           {users.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.username || "No username"}</TableCell>
+              <TableCell>{user.email || "No email"}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Switch
