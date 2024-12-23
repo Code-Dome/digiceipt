@@ -88,7 +88,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
-      // Even if there's an error, ensure the user is logged out locally
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);

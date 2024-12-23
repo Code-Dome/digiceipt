@@ -26,10 +26,9 @@ const Index = () => {
     navigate("/admin");
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     posthog.capture('user_logged_out');
-    await logout();
-    navigate('/login');
+    logout();
   };
 
   if (!isAuthenticated) {
