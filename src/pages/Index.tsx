@@ -21,14 +21,14 @@ const Index = () => {
     navigate("/view");
   };
 
-  const handleAdminClick = () => {
-    posthog.capture('admin_page_accessed');
+  const handleSettingsClick = () => {
+    posthog.capture('settings_page_accessed');
     navigate("/admin");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     posthog.capture('user_logged_out');
-    logout();
+    await logout();
   };
 
   if (!isAuthenticated) {
@@ -44,11 +44,11 @@ const Index = () => {
           <ThemeSwitcher />
           {isAdmin && (
             <Button 
-              onClick={handleAdminClick}
+              onClick={handleSettingsClick}
               variant="outline"
               className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
             >
-              <Settings className="mr-2 h-4 w-4" /> Admin
+              <Settings className="mr-2 h-4 w-4" /> Settings
             </Button>
           )}
           <Button 
