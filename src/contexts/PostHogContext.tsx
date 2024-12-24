@@ -1,14 +1,18 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import posthog from 'posthog-js';
 import { supabase } from '@/integrations/supabase/client';
 
-const PostHogContext = createContext<typeof posthog | null>(null);
+interface PostHogContextType {
+  isInitialized: boolean;
+}
+
+const PostHogContext = createContext<PostHogContextType>({ isInitialized: false });
 
 export const PostHogProvider = ({ children }: { children: React.ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const initPostHog = async () => {
+    const initializePostHog = async () => {
       try {
         const { data, error } = await supabase
           .from('secrets')
@@ -24,9 +28,8 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
         if (data?.value) {
           posthog.init(data.value, {
             api_host: 'https://app.posthog.com',
-            loaded: (posthog) => {
-              if (process.env.NODE_ENV === 'development') posthog.debug();
-            }
+            capture_pageview: true,
+            disable_session_recording: false,
           });
           setIsInitialized(true);
         } else {
@@ -37,20 +40,15 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
       }
     };
 
-    if (!isInitialized) {
-      initPostHog();
-    }
+    initializePostHog();
 
-    // Instead of using shutdown, we'll use reset
     return () => {
-      if (isInitialized) {
-        posthog.reset(); // This is a standard method in PostHog for cleanup
-      }
+      posthog.reset();
     };
-  }, [isInitialized]);
+  }, []);
 
   return (
-    <PostHogContext.Provider value={posthog}>
+    <PostHogContext.Provider value={{ isInitialized }}>
       {children}
     </PostHogContext.Provider>
   );
@@ -61,5 +59,5 @@ export const usePostHog = () => {
   if (!context) {
     throw new Error('usePostHog must be used within a PostHogProvider');
   }
-  return context;
+  return posthog;
 };
