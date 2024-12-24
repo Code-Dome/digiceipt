@@ -19,7 +19,7 @@ const Admin = () => {
 
   useEffect(() => {
     if (!isAdmin) {
-      navigate("/view");
+      navigate("/");
     }
   }, [isAdmin, navigate]);
 
@@ -29,11 +29,11 @@ const Admin = () => {
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
-            onClick={() => navigate("/view")}
+            onClick={() => navigate("/")}
             className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to View
+            Back to Dashboard
           </Button>
           <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-400">
             Settings
