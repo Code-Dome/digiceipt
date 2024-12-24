@@ -39,9 +39,10 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
       initPostHog();
     }
 
+    // Instead of using shutdown, we'll use reset
     return () => {
       if (isInitialized) {
-        posthog.shutdown();
+        posthog.reset(); // This is a standard method in PostHog for cleanup
       }
     };
   }, [isInitialized]);
