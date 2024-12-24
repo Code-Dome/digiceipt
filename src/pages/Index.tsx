@@ -5,11 +5,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/contexts/PostHogContext";
 import { WashingStats } from "@/components/WashingStats";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { useEffect } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { logout, isAdmin, isAuthenticated } = useAuth();
   const posthog = usePostHog();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleCreateClick = () => {
     posthog.capture('create_receipt_clicked');
@@ -32,7 +39,6 @@ const Index = () => {
   };
 
   if (!isAuthenticated) {
-    navigate('/login');
     return null;
   }
 
