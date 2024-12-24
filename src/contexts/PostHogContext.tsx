@@ -14,7 +14,7 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
           .from('secrets')
           .select('value')
           .eq('name', 'POSTHOG_API_KEY')
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching PostHog API key:', error);
@@ -29,6 +29,8 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
             }
           });
           setIsInitialized(true);
+        } else {
+          console.warn('PostHog API key not found in secrets table');
         }
       } catch (error) {
         console.error('Error initializing PostHog:', error);
