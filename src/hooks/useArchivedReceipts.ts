@@ -31,18 +31,19 @@ export const useArchivedReceipts = () => {
       // First, insert the receipt back into Supabase
       const { error: insertError } = await supabase
         .from('receipts')
-        .insert([{
+        .insert({
+          user_id: user.id,
           driver_name: receipt.driverName,
           horse_reg: receipt.horseReg,
           company_name: receipt.companyName,
           wash_type: receipt.washType,
           other_wash_type: receipt.otherWashType,
-          custom_fields: receipt.customFields,
+          custom_fields: JSON.parse(JSON.stringify(receipt.customFields)),
           signature: receipt.signature,
-          removed_fields: receipt.removedFields || [],
-          removed_custom_fields: receipt.removedCustomFields || [],
+          removed_fields: JSON.parse(JSON.stringify(receipt.removedFields || [])),
+          removed_custom_fields: JSON.parse(JSON.stringify(receipt.removedCustomFields || [])),
           invoice_no: receipt.invoiceNo,
-        }]);
+        });
 
       if (insertError) {
         console.error('Error inserting unarchived receipt:', insertError);
