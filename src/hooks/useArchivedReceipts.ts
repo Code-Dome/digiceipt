@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Receipt } from '@/types/receipt';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { mapDatabaseToReceipt } from '@/utils/receiptMapper';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useArchivedReceipts = () => {
   const [archivedReceipts, setArchivedReceipts] = useState<Receipt[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const loadArchivedReceipts = useCallback(() => {
     const saved = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
@@ -21,13 +22,16 @@ export const useArchivedReceipts = () => {
   }, [loadArchivedReceipts]);
 
   const handleUnarchive = useCallback(async (receipt: Receipt) => {
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
+
     try {
       // First, insert the receipt back into Supabase
       const { error: insertError } = await supabase
         .from('receipts')
         .insert({
-          id: receipt.id,
-          user_id: receipt.user_id,
           invoice_no: receipt.invoiceNo,
           driver_name: receipt.driverName,
           horse_reg: receipt.horseReg,
@@ -36,8 +40,8 @@ export const useArchivedReceipts = () => {
           other_wash_type: receipt.otherWashType,
           custom_fields: receipt.customFields,
           signature: receipt.signature,
-          removed_fields: receipt.removedFields,
-          removed_custom_fields: receipt.removedCustomFields,
+          removed_fields: receipt.removedFields || [],
+          removed_custom_fields: receipt.removedCustomFields || [],
         });
 
       if (insertError) {
@@ -70,7 +74,7 @@ export const useArchivedReceipts = () => {
         variant: 'destructive',
       });
     }
-  }, [archivedReceipts, toast]);
+  }, [archivedReceipts, toast, user]);
 
   const handleDelete = useCallback((receipt: Receipt) => {
     const updatedReceipts = archivedReceipts.filter(r => r.id !== receipt.id);
