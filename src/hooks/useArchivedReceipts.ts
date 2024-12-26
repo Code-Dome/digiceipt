@@ -28,8 +28,13 @@ export const useArchivedReceipts = () => {
     }
 
     try {
+      // Convert custom fields to JSON
+      const customFieldsJson = JSON.stringify(receipt.customFields || []);
+      const removedFieldsJson = JSON.stringify(receipt.removedFields || []);
+      const removedCustomFieldsJson = JSON.stringify(receipt.removedCustomFields || []);
+
       // First, insert the receipt back into Supabase
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from('receipts')
         .insert({
           user_id: user.id,
@@ -38,12 +43,13 @@ export const useArchivedReceipts = () => {
           company_name: receipt.companyName,
           wash_type: receipt.washType,
           other_wash_type: receipt.otherWashType,
-          custom_fields: JSON.parse(JSON.stringify(receipt.customFields)),
+          custom_fields: customFieldsJson,
           signature: receipt.signature,
-          removed_fields: JSON.parse(JSON.stringify(receipt.removedFields || [])),
-          removed_custom_fields: JSON.parse(JSON.stringify(receipt.removedCustomFields || [])),
+          removed_fields: removedFieldsJson,
+          removed_custom_fields: removedCustomFieldsJson,
           invoice_no: receipt.invoiceNo,
-        });
+        })
+        .select(); // Add .select() to return the inserted data
 
       if (insertError) {
         console.error('Error inserting unarchived receipt:', insertError);
@@ -54,6 +60,9 @@ export const useArchivedReceipts = () => {
         });
         return;
       }
+
+      // Log the inserted data for debugging
+      console.log('Inserted receipt data:', data);
 
       // Update localStorage
       const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
