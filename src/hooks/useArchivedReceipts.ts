@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Receipt } from '@/types/receipt';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { mapDatabaseToReceipt } from '@/utils/receiptMapper';
 
 export const useArchivedReceipts = () => {
   const [archivedReceipts, setArchivedReceipts] = useState<Receipt[]>([]);
@@ -18,25 +20,56 @@ export const useArchivedReceipts = () => {
     loadArchivedReceipts();
   }, [loadArchivedReceipts]);
 
-  const handleUnarchive = useCallback((receipt: Receipt) => {
-    const activeReceipts = JSON.parse(localStorage.getItem('receipts') || '[]') as Receipt[];
-    
-    // Update active receipts
-    const updatedActive = [...activeReceipts, receipt];
-    localStorage.setItem('receipts', JSON.stringify(updatedActive));
-    
-    // Update archived receipts
-    const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
-    localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
-    
-    // Update state immediately
-    setArchivedReceipts(updatedArchived);
-    
-    toast({
-      title: "Receipt restored",
-      description: `Invoice #${receipt.invoiceNo} has been restored to active receipts.`,
-      duration: 2000,
-    });
+  const handleUnarchive = useCallback(async (receipt: Receipt) => {
+    try {
+      // First, insert the receipt back into Supabase
+      const { error: insertError } = await supabase
+        .from('receipts')
+        .insert({
+          id: receipt.id,
+          user_id: receipt.user_id,
+          invoice_no: receipt.invoiceNo,
+          driver_name: receipt.driverName,
+          horse_reg: receipt.horseReg,
+          company_name: receipt.companyName,
+          wash_type: receipt.washType,
+          other_wash_type: receipt.otherWashType,
+          custom_fields: receipt.customFields,
+          signature: receipt.signature,
+          removed_fields: receipt.removedFields,
+          removed_custom_fields: receipt.removedCustomFields,
+        });
+
+      if (insertError) {
+        console.error('Error inserting unarchived receipt:', insertError);
+        toast({
+          title: "Error restoring receipt",
+          description: insertError.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Update localStorage
+      const updatedArchived = archivedReceipts.filter(r => r.id !== receipt.id);
+      localStorage.setItem('archivedReceipts', JSON.stringify(updatedArchived));
+      
+      // Update state immediately
+      setArchivedReceipts(updatedArchived);
+      
+      toast({
+        title: "Receipt restored",
+        description: `Invoice #${receipt.invoiceNo} has been restored to active receipts.`,
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Error in handleUnarchive:', error);
+      toast({
+        title: "Error restoring receipt",
+        description: "An unexpected error occurred while restoring the receipt.",
+        variant: 'destructive',
+      });
+    }
   }, [archivedReceipts, toast]);
 
   const handleDelete = useCallback((receipt: Receipt) => {
