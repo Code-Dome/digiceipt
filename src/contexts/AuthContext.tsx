@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Session } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   session: Session | null;
+  user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -17,6 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
   const checkAdminStatus = async (userId: string) => {
@@ -42,6 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
+      setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
       if (session?.user) {
         const isAdminUser = await checkAdminStatus(session.user.id);
@@ -53,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+      setUser(session?.user ?? null);
       setIsAuthenticated(!!session);
       if (session?.user) {
         const isAdminUser = await checkAdminStatus(session.user.id);
@@ -85,18 +89,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
+      setUser(null);
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
+      setUser(null);
       navigate('/login');
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isAdmin, session, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isAdmin, session, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
