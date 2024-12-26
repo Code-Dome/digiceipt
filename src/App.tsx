@@ -5,6 +5,7 @@ import View from "@/pages/View";
 import Archive from "@/pages/Archive";
 import Admin from "@/pages/Admin";
 import Login from "@/pages/Login";
+import Stats from "@/pages/Stats";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -52,6 +53,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <Admin />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/stats"
+                    element={
+                      <ProtectedRoute>
+                        <Stats />
                       </ProtectedRoute>
                     }
                   />

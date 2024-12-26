@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, LogOut, Settings } from "lucide-react";
+import { Plus, FileText, LogOut, Settings, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/contexts/PostHogContext";
@@ -28,6 +28,11 @@ const Index = () => {
     navigate("/view");
   };
 
+  const handleStatsClick = () => {
+    posthog.capture('stats_page_accessed');
+    navigate("/stats");
+  };
+
   const handleSettingsClick = () => {
     posthog.capture('settings_page_accessed');
     navigate("/admin");
@@ -48,6 +53,13 @@ const Index = () => {
         <h1 className="text-2xl md:text-3xl font-bold text-violet-700 dark:text-violet-400">Digital Receipts</h1>
         <div className="flex flex-wrap gap-2 items-center">
           <ThemeSwitcher />
+          <Button 
+            onClick={handleStatsClick}
+            variant="outline"
+            className="w-full md:w-auto bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+          >
+            <BarChart className="mr-2 h-4 w-4" /> Statistics
+          </Button>
           {isAdmin && (
             <Button 
               onClick={handleSettingsClick}
