@@ -14,11 +14,14 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const IDLE_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [lastActivity, setLastActivity] = useState(Date.now());
   const navigate = useNavigate();
 
   const checkAdminStatus = async (userId: string) => {
@@ -40,6 +43,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return false;
     }
   };
+
+  // Reset the idle timer when there's user activity
+  const resetIdleTimer = () => {
+    setLastActivity(Date.now());
+  };
+
+  // Check for user inactivity
+  useEffect(() => {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    
+    // Add event listeners
+    events.forEach(event => {
+      document.addEventListener(event, resetIdleTimer);
+    });
+
+    // Check for inactivity every minute
+    const intervalId = setInterval(() => {
+      const timeSinceLastActivity = Date.now() - lastActivity;
+      if (timeSinceLastActivity >= IDLE_TIMEOUT && isAuthenticated) {
+        console.log('User inactive for 30 minutes, logging out');
+        logout();
+      }
+    }, 60000);
+
+    return () => {
+      // Cleanup event listeners and interval
+      events.forEach(event => {
+        document.removeEventListener(event, resetIdleTimer);
+      });
+      clearInterval(intervalId);
+    };
+  }, [lastActivity, isAuthenticated]);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -80,6 +115,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return false;
     }
     
+    setLastActivity(Date.now());
     return true;
   };
 
