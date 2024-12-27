@@ -5,9 +5,12 @@ import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { useToast } from "./ui/use-toast";
 import { CompanySettings as CompanySettingsType } from "@/types/companySettings";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const CompanySettings = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [settings, setSettings] = useState<CompanySettingsType>({
     companyName: "",
     address: "",
@@ -15,18 +18,64 @@ export const CompanySettings = () => {
   });
 
   useEffect(() => {
-    const savedSettings = localStorage.getItem('companySettings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
+    if (user) {
+      fetchSettings();
     }
-  }, []);
+  }, [user]);
 
-  const handleSave = () => {
-    localStorage.setItem('companySettings', JSON.stringify(settings));
-    toast({
-      title: "Settings saved",
-      description: "Company settings have been updated successfully."
-    });
+  const fetchSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('company_settings')
+        .select('company_name, address, terms_and_conditions')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setSettings({
+          companyName: data.company_name || "",
+          address: data.address || "",
+          termsAndConditions: data.terms_and_conditions || ""
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      toast({
+        title: "Error fetching settings",
+        description: "Failed to load company settings.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('company_settings')
+        .upsert({
+          user_id: user?.id,
+          company_name: settings.companyName,
+          address: settings.address,
+          terms_and_conditions: settings.termsAndConditions,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Settings saved",
+        description: "Company settings have been updated successfully."
+      });
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast({
+        title: "Error saving settings",
+        description: "Failed to save company settings.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
