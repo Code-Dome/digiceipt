@@ -81,3 +81,23 @@
 .signature-pad {
   @apply w-full h-40 border border-input rounded-lg touch-none bg-background shadow-sm dark:bg-gray-900;
 }
+
+/* Auth UI Overrides */
+.auth-container {
+  width: 100%;
+}
+
+.auth-input {
+  width: 100% !important;
+  background-color: transparent !important;
+  pointer-events: auto !important;
+}
+
+.auth-button {
+  width: 100%;
+}
+
+/* Ensure inputs are interactive */
+input, button {
+  pointer-events: auto !important;
+}

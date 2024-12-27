@@ -43,7 +43,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md">
+      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold text-center text-violet-700 dark:text-violet-400 mb-6">
           Digital Receipts Login
         </h1>
@@ -59,6 +59,11 @@ const Login = () => {
                 },
               },
             },
+            className: {
+              container: 'auth-container',
+              button: 'auth-button',
+              input: 'auth-input',
+            },
             style: {
               button: {
                 borderRadius: '0.375rem',
@@ -67,6 +72,7 @@ const Login = () => {
               input: {
                 borderRadius: '0.375rem',
                 backgroundColor: 'transparent',
+                pointerEvents: 'auto',
               },
               anchor: {
                 color: '#8b5cf6',
