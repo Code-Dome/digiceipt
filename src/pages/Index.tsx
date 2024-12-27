@@ -3,7 +3,6 @@ import { Plus, FileText, LogOut, Settings, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/contexts/PostHogContext";
-import { WashingStats } from "@/components/WashingStats";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { useEffect } from "react";
 
@@ -102,8 +101,6 @@ const Index = () => {
           </Button>
         </div>
       </div>
-
-      <WashingStats />
     </div>
   );
 };
