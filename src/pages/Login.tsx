@@ -66,6 +66,7 @@ const Login = () => {
               },
               input: {
                 borderRadius: '0.375rem',
+                backgroundColor: 'transparent',
               },
               anchor: {
                 color: '#8b5cf6',
@@ -74,6 +75,14 @@ const Login = () => {
           }}
           theme="default"
           providers={[]}
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: 'Email',
+                password_label: 'Password',
+              },
+            },
+          }}
         />
       </div>
     </div>
