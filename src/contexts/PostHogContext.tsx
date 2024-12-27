@@ -27,7 +27,7 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
 
         if (data?.value) {
           posthog.init(data.value, {
-            api_host: 'https://app.posthog.com',
+            api_host: 'https://us.i.posthog.com',
             capture_pageview: true,
             disable_session_recording: false,
           });
