@@ -65,16 +65,16 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
 
   // Provide a mock posthog object if initialization fails
   const safePostHog = {
-    capture: (...args: any[]) => {
+    capture: (eventName: string, properties?: Record<string, any>) => {
       if (!isInitialized) {
         console.warn('PostHog not initialized, skipping event capture');
       } else {
-        posthog.capture(...args);
+        posthog.capture(eventName, properties);
       }
     },
-    identify: (...args: any[]) => {
+    identify: (distinctId: string, properties?: Record<string, any>) => {
       if (isInitialized) {
-        posthog.identify(...args);
+        posthog.identify(distinctId, properties);
       }
     },
     reset: () => {
