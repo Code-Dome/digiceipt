@@ -3,12 +3,8 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Edit, Archive, RotateCcw, Trash2, Printer, Download } from "lucide-react";
 import { useMemo } from "react";
 import { 
   archiveReceipt, 
@@ -18,19 +14,10 @@ import {
   downloadReceipt 
 } from "@/utils/receiptActions";
 import { useToast } from "@/components/ui/use-toast";
-import { format, parseISO } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { parseISO } from "date-fns";
+import { InvoiceActions } from "./InvoiceActions";
+import { InvoiceTableHeader } from "./InvoiceTableHeader";
 
 interface InvoiceTableProps {
   invoices: Receipt[];
@@ -115,19 +102,7 @@ export const InvoiceTable = ({
   return (
     <div className="rounded-md border border-violet-200">
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Invoice #</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Driver Name</TableHead>
-            <TableHead>Company</TableHead>
-            <TableHead>Wash Type</TableHead>
-            {customFieldLabels.map(label => (
-              <TableHead key={label}>{label}</TableHead>
-            ))}
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
+        <InvoiceTableHeader customFieldLabels={customFieldLabels} />
         <TableBody>
           {invoices.map((invoice) => (
             <TableRow key={invoice.id}>
@@ -145,79 +120,16 @@ export const InvoiceTable = ({
                 </TableCell>
               ))}
               <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(invoice)}
-                    className="hover:bg-violet-100"
-                  >
-                    <Edit className="h-4 w-4 text-violet-700" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => printReceipt(invoice)}
-                    className="hover:bg-violet-100"
-                  >
-                    <Printer className="h-4 w-4 text-violet-700" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => downloadReceipt(invoice)}
-                    className="hover:bg-violet-100"
-                  >
-                    <Download className="h-4 w-4 text-violet-700" />
-                  </Button>
-                  {isArchivePage ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleUnarchive(invoice)}
-                      className="hover:bg-violet-100"
-                    >
-                      <RotateCcw className="h-4 w-4 text-violet-700" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleArchive(invoice)}
-                      className="hover:bg-violet-100"
-                    >
-                      <Archive className="h-4 w-4 text-violet-700" />
-                    </Button>
-                  )}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="hover:bg-red-100"
-                      >
-                        <Trash2 className="h-4 w-4 text-red-700" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Receipt</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete Invoice #{invoice.invoiceNo}? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(invoice)}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+                <InvoiceActions
+                  invoice={invoice}
+                  isArchivePage={isArchivePage}
+                  onEdit={onEdit}
+                  onArchive={handleArchive}
+                  onUnarchive={handleUnarchive}
+                  onDelete={handleDelete}
+                  onPrint={printReceipt}
+                  onDownload={downloadReceipt}
+                />
               </TableCell>
             </TableRow>
           ))}
