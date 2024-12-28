@@ -27,30 +27,32 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
           return;
         }
 
-        if (data?.value) {
-          try {
-            posthog.init(data.value, {
-              api_host: 'https://us.i.posthog.com',
-              loaded: (posthog) => {
-                setIsInitialized(true);
-              },
-              capture_pageview: true,
-              disable_session_recording: true, // Disable session recording to reduce errors
-              autocapture: false, // Disable autocapture to reduce errors
-            });
-          } catch (initError) {
-            console.error('Error initializing PostHog:', initError);
-            toast({
-              title: "Analytics Error",
-              description: "Failed to initialize analytics. This won't affect the app's functionality.",
-              variant: "destructive",
-            });
-          }
-        } else {
+        if (!data?.value) {
           console.warn('PostHog API key not found in secrets table');
+          return;
         }
+
+        // Initialize PostHog with more conservative options
+        posthog.init(data.value, {
+          api_host: 'https://app.posthog.com', // Changed from us.i.posthog.com
+          loaded: () => {
+            setIsInitialized(true);
+          },
+          capture_pageview: false, // Disable automatic page view capture
+          disable_session_recording: true,
+          autocapture: false,
+          persistence: 'memory', // Use memory persistence to avoid localStorage issues
+          bootstrap: {
+            distinctID: 'anonymous',
+          },
+        });
       } catch (error) {
         console.error('Error initializing PostHog:', error);
+        toast({
+          title: "Analytics Error",
+          description: "Failed to initialize analytics. This won't affect the app's functionality.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -63,23 +65,33 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
     };
   }, [toast]);
 
-  // Provide a mock posthog object if initialization fails
+  // Create a safe wrapper for PostHog methods
   const safePostHog = {
     capture: (eventName: string, properties?: Record<string, any>) => {
-      if (!isInitialized) {
-        console.warn('PostHog not initialized, skipping event capture');
-      } else {
-        posthog.capture(eventName, properties);
+      if (isInitialized) {
+        try {
+          posthog.capture(eventName, properties);
+        } catch (error) {
+          console.error('Error capturing PostHog event:', error);
+        }
       }
     },
     identify: (distinctId: string, properties?: Record<string, any>) => {
       if (isInitialized) {
-        posthog.identify(distinctId, properties);
+        try {
+          posthog.identify(distinctId, properties);
+        } catch (error) {
+          console.error('Error identifying PostHog user:', error);
+        }
       }
     },
     reset: () => {
       if (isInitialized) {
-        posthog.reset();
+        try {
+          posthog.reset();
+        } catch (error) {
+          console.error('Error resetting PostHog:', error);
+        }
       }
     },
   };
