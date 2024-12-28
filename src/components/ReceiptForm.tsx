@@ -1,19 +1,14 @@
 import { useState, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
-import { formatInTimeZone } from "date-fns-tz";
-import { parseISO } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import { Receipt, CustomField, FieldType } from "@/types/receipt";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CustomFieldInput } from "./CustomFieldInput";
-import { SignaturePad } from "./SignaturePad";
 import { DefaultFields } from "./DefaultFields";
 import { RestoreFields } from "./RestoreFields";
-import { useToast } from "@/hooks/use-toast";
-import { defaultFields } from "./ReceiptForm/FieldTypes";
+import { SignaturePad } from "./SignaturePad";
+import { HeaderSection } from "./ReceiptForm/HeaderSection";
+import { CustomFieldsSection } from "./ReceiptForm/CustomFieldsSection";
 
 const generateUniqueInvoiceNo = () => {
   const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
@@ -28,7 +23,11 @@ const generateUniqueInvoiceNo = () => {
   return invoiceNo;
 };
 
-const ReceiptForm = ({ initialData, onSave, onUpdate }: { 
+const ReceiptForm = ({ 
+  initialData, 
+  onSave, 
+  onUpdate 
+}: { 
   initialData?: Receipt;
   onSave: (receipt: Receipt) => void;
   onUpdate: (receipt: Receipt) => void;
@@ -47,19 +46,6 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
     removedFields: initialData?.removedFields || [],
     removedCustomFields: initialData?.removedCustomFields || [],
   }));
-
-  const formatDate = (dateString: string) => {
-    try {
-      return formatInTimeZone(
-        parseISO(dateString),
-        'Africa/Johannesburg',
-        'dd/MM/yyyy HH:mm:ss'
-      );
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return dateString;
-    }
-  };
 
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [showOtherWashType, setShowOtherWashType] = useState(receipt.washType === "Other");
@@ -146,17 +132,13 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
   };
 
   return (
-    <Card className="w-full dark:bg-gray-800 dark:border-gray-700">
-      <CardContent className="p-6">
-        <div className="space-y-8">
-          <div className="flex justify-between">
-            <div>
-              <p className="font-semibold text-violet-700 dark:text-violet-400">Invoice #{receipt.invoiceNo}</p>
-              <p className="text-sm text-violet-500 dark:text-violet-300">
-                {formatDate(receipt.timestamp)}
-              </p>
-            </div>
-          </div>
+    <Card className="w-full max-w-3xl mx-auto dark:bg-gray-800 dark:border-gray-700">
+      <CardContent className="p-4 sm:p-6">
+        <div className="space-y-6">
+          <HeaderSection 
+            invoiceNo={receipt.invoiceNo} 
+            timestamp={receipt.timestamp} 
+          />
 
           <div className="grid gap-6">
             <DefaultFields
@@ -175,59 +157,13 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
               onRestoreCustomField={restoreCustomField}
             />
 
-            {showOtherWashType && !receipt.removedFields?.includes('washType') && (
-              <div className="grid gap-2">
-                <Label htmlFor="otherWashType">Specify Other Wash Type</Label>
-                <Input
-                  id="otherWashType"
-                  value={receipt.otherWashType}
-                  onChange={(e) => handleInputChange("otherWashType", e.target.value)}
-                  className="dark:bg-gray-900 dark:border-gray-700 dark:text-white"
-                />
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <Label>Custom Fields</Label>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addCustomField("text")}
-                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-violet-400 dark:border-gray-700"
-                >
-                  Add Text Field
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addCustomField("dropdown")}
-                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-violet-400 dark:border-gray-700"
-                >
-                  Add Dropdown
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => addCustomField("checkbox")}
-                  className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-900 dark:hover:bg-gray-800 dark:text-violet-400 dark:border-gray-700"
-                >
-                  Add Checkbox
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                {receipt.customFields.map((field) => (
-                  <CustomFieldInput
-                    key={field.id}
-                    field={field}
-                    onUpdate={updateCustomField}
-                    onRemove={removeCustomField}
-                    setHasError={setHasFieldErrors}
-                  />
-                ))}
-              </div>
-            </div>
+            <CustomFieldsSection
+              customFields={receipt.customFields}
+              onAddField={addCustomField}
+              onUpdateField={updateCustomField}
+              onRemoveField={removeCustomField}
+              setHasFieldErrors={setHasFieldErrors}
+            />
 
             <SignaturePad 
               sigCanvas={sigCanvas} 
@@ -237,7 +173,7 @@ const ReceiptForm = ({ initialData, onSave, onUpdate }: {
 
             <Button 
               onClick={handleSave} 
-              className="mt-4 bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-700 dark:hover:bg-violet-800"
+              className="w-full sm:w-auto mt-4 bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-700 dark:hover:bg-violet-800"
               disabled={hasFieldErrors}
             >
               {initialData?.id ? "Update Receipt" : "Save Receipt"}
