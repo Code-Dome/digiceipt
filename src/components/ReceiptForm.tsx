@@ -9,6 +9,7 @@ import { RestoreFields } from "./RestoreFields";
 import { SignaturePad } from "./SignaturePad";
 import { HeaderSection } from "./ReceiptForm/HeaderSection";
 import { CustomFieldsSection } from "./ReceiptForm/CustomFieldsSection";
+import { defaultFields } from "./ReceiptForm/FieldTypes"; // Add this import
 
 const generateUniqueInvoiceNo = () => {
   const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
@@ -142,7 +143,7 @@ const ReceiptForm = ({
 
           <div className="grid gap-6">
             <DefaultFields
-              fields={defaultFields}
+              fields={defaultFields} // Use the imported defaultFields
               values={receipt}
               removedFields={receipt.removedFields || []}
               onInputChange={handleInputChange}
@@ -152,7 +153,7 @@ const ReceiptForm = ({
             <RestoreFields
               removedFields={receipt.removedFields || []}
               removedCustomFields={receipt.removedCustomFields || []}
-              defaultFields={defaultFields}
+              defaultFields={defaultFields} // Use the imported defaultFields
               onRestoreField={restoreDefaultField}
               onRestoreCustomField={restoreCustomField}
             />
