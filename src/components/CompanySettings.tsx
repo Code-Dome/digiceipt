@@ -29,7 +29,7 @@ export const CompanySettings = () => {
         .from('company_settings')
         .select('company_name, address, terms_and_conditions')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -39,6 +39,25 @@ export const CompanySettings = () => {
           address: data.address || "",
           termsAndConditions: data.terms_and_conditions || ""
         });
+      } else {
+        // If no settings exist, create default settings
+        const { error: insertError } = await supabase
+          .from('company_settings')
+          .insert({
+            user_id: user?.id,
+            company_name: "",
+            address: "",
+            terms_and_conditions: ""
+          });
+
+        if (insertError) {
+          console.error('Error creating default settings:', insertError);
+          toast({
+            title: "Error creating settings",
+            description: "Failed to create default company settings.",
+            variant: "destructive"
+          });
+        }
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
