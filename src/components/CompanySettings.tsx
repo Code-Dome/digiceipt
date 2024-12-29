@@ -43,7 +43,6 @@ export const CompanySettings = () => {
           termsAndConditions: data.terms_and_conditions || ""
         });
       } else {
-        // If no settings exist, create default settings
         const { error: insertError } = await supabase
           .from('company_settings')
           .insert({
@@ -102,17 +101,17 @@ export const CompanySettings = () => {
 
   return (
     <Card className="bg-background border border-border">
-      <div className="p-4 md:p-6 border-b border-border">
+      <div className="p-4 sm:p-6 border-b border-border">
         <div className="flex items-center gap-2">
           <Building className="w-5 h-5 text-primary" />
-          <h2 className="text-xl md:text-2xl font-bold text-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">
             Company Settings
           </h2>
         </div>
       </div>
 
       <ScrollArea className="h-[calc(100vh-300px)]">
-        <div className="p-4 md:p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
           <div className="space-y-2">
             <Label htmlFor="companyName">Company Name</Label>
             <Input

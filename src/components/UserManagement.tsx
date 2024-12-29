@@ -82,52 +82,54 @@ export const UserManagement = () => {
   };
 
   return (
-    <Card className="p-4 md:p-6 bg-background border border-border">
+    <Card className="p-4 sm:p-6 bg-background border border-border">
       <div className="flex items-center gap-2 mb-6">
         <User className="w-5 h-5 text-primary" />
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground">
           User Management
         </h2>
       </div>
 
       <ScrollArea className="h-[calc(100vh-300px)] rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[200px]">Username</TableHead>
-              <TableHead className="w-[200px]">Organization</TableHead>
-              <TableHead className="w-[150px]">Admin Role</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
-                  {user.username || "No username"}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-muted-foreground" />
-                    <span>{user.organization?.name || "No organization"}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={user.is_admin}
-                      onCheckedChange={() =>
-                        toggleAdminStatus(user.id, user.is_admin)
-                      }
-                    />
-                    {user.is_admin && (
-                      <Shield className="w-4 h-4 text-primary" />
-                    )}
-                  </div>
-                </TableCell>
+        <div className="min-w-[600px] sm:min-w-full">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">Username</TableHead>
+                <TableHead className="w-[200px]">Organization</TableHead>
+                <TableHead className="w-[150px]">Admin Role</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">
+                    {user.username || "No username"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-muted-foreground" />
+                      <span>{user.organization?.name || "No organization"}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={user.is_admin}
+                        onCheckedChange={() =>
+                          toggleAdminStatus(user.id, user.is_admin)
+                        }
+                      />
+                      {user.is_admin && (
+                        <Shield className="w-4 h-4 text-primary" />
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </ScrollArea>
     </Card>
   );
