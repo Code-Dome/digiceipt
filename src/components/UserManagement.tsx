@@ -11,12 +11,16 @@ import {
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { Shield, User } from "lucide-react";
+import { Shield, User, Building2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Profile {
   id: string;
   username: string | null;
   is_admin: boolean;
+  organization: {
+    name: string;
+  } | null;
 }
 
 export const UserManagement = () => {
@@ -26,7 +30,15 @@ export const UserManagement = () => {
   const loadUsers = async () => {
     const { data: profiles, error } = await supabase
       .from("profiles")
-      .select("id, username, is_admin");
+      .select(`
+        id, 
+        username, 
+        is_admin,
+        organizations (
+          name
+        )
+      `)
+      .returns<Profile[]>();
 
     if (error) {
       console.error("Error loading users:", error);
@@ -70,40 +82,53 @@ export const UserManagement = () => {
   };
 
   return (
-    <Card className="p-6">
+    <Card className="p-4 md:p-6 bg-background border border-border">
       <div className="flex items-center gap-2 mb-6">
-        <User className="w-5 h-5 text-violet-600" />
-        <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-400">
+        <User className="w-5 h-5 text-primary" />
+        <h2 className="text-xl md:text-2xl font-bold text-foreground">
           User Management
         </h2>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Username</TableHead>
-            <TableHead>Admin Role</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.username || "No username"}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={user.is_admin}
-                    onCheckedChange={() => toggleAdminStatus(user.id, user.is_admin)}
-                  />
-                  {user.is_admin && (
-                    <Shield className="w-4 h-4 text-violet-600" />
-                  )}
-                </div>
-              </TableCell>
+      <ScrollArea className="h-[calc(100vh-300px)] rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[200px]">Username</TableHead>
+              <TableHead className="w-[200px]">Organization</TableHead>
+              <TableHead className="w-[150px]">Admin Role</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="font-medium">
+                  {user.username || "No username"}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-muted-foreground" />
+                    <span>{user.organization?.name || "No organization"}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={user.is_admin}
+                      onCheckedChange={() =>
+                        toggleAdminStatus(user.id, user.is_admin)
+                      }
+                    />
+                    {user.is_admin && (
+                      <Shield className="w-4 h-4 text-primary" />
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </ScrollArea>
     </Card>
   );
 };

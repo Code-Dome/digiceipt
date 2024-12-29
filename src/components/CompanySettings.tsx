@@ -7,6 +7,9 @@ import { useToast } from "./ui/use-toast";
 import { CompanySettings as CompanySettingsType } from "@/types/companySettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Building, Save } from "lucide-react";
+import { Card } from "./ui/card";
+import { ScrollArea } from "./ui/scroll-area";
 
 export const CompanySettings = () => {
   const { toast } = useToast();
@@ -98,46 +101,60 @@ export const CompanySettings = () => {
   };
 
   return (
-    <div className="space-y-4 p-4 bg-white rounded-lg border border-violet-200 dark:bg-gray-800 dark:border-gray-700">
-      <div className="space-y-2">
-        <Label htmlFor="companyName" className="dark:text-gray-300">Company Name</Label>
-        <Input
-          id="companyName"
-          value={settings.companyName}
-          onChange={(e) => setSettings(prev => ({ ...prev, companyName: e.target.value }))}
-          placeholder="Enter company name"
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="address" className="dark:text-gray-300">Address</Label>
-        <Input
-          id="address"
-          value={settings.address}
-          onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
-          placeholder="Enter company address"
-          className="dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
+    <Card className="bg-background border border-border">
+      <div className="p-4 md:p-6 border-b border-border">
+        <div className="flex items-center gap-2">
+          <Building className="w-5 h-5 text-primary" />
+          <h2 className="text-xl md:text-2xl font-bold text-foreground">
+            Company Settings
+          </h2>
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="termsAndConditions" className="dark:text-gray-300">Terms & Conditions</Label>
-        <Textarea
-          id="termsAndConditions"
-          value={settings.termsAndConditions}
-          onChange={(e) => setSettings(prev => ({ ...prev, termsAndConditions: e.target.value }))}
-          placeholder="Enter terms and conditions"
-          className="min-h-[100px] dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
-        />
-      </div>
+      <ScrollArea className="h-[calc(100vh-300px)]">
+        <div className="p-4 md:p-6 space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="companyName">Company Name</Label>
+            <Input
+              id="companyName"
+              value={settings.companyName}
+              onChange={(e) => setSettings(prev => ({ ...prev, companyName: e.target.value }))}
+              placeholder="Enter company name"
+              className="bg-background"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="address">Address</Label>
+            <Textarea
+              id="address"
+              value={settings.address}
+              onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
+              placeholder="Enter company address"
+              className="bg-background resize-none h-24"
+            />
+          </div>
 
-      <Button 
-        onClick={handleSave} 
-        className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold dark:bg-violet-700 dark:hover:bg-violet-800"
-      >
-        Save Settings
-      </Button>
-    </div>
+          <div className="space-y-2">
+            <Label htmlFor="termsAndConditions">Terms & Conditions</Label>
+            <Textarea
+              id="termsAndConditions"
+              value={settings.termsAndConditions}
+              onChange={(e) => setSettings(prev => ({ ...prev, termsAndConditions: e.target.value }))}
+              placeholder="Enter terms and conditions"
+              className="bg-background resize-none h-48"
+            />
+          </div>
+
+          <Button 
+            onClick={handleSave}
+            className="w-full"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Save Settings
+          </Button>
+        </div>
+      </ScrollArea>
+    </Card>
   );
 };
