@@ -5,10 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CompanySettings } from "@/components/CompanySettings";
 import { UserManagement } from "@/components/UserManagement";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanyManagement } from "@/hooks/useCompanyManagement";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 const Admin = () => {
   const { isAdmin } = useAuth();
