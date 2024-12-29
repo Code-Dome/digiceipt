@@ -86,6 +86,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
+      // Clear any Supabase-related items from localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith('sb-')) {
+          localStorage.removeItem(key);
+        }
+      }
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
@@ -93,6 +100,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
+      // Even if there's an error, try to clean up the state and storage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith('sb-')) {
+          localStorage.removeItem(key);
+        }
+      }
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
