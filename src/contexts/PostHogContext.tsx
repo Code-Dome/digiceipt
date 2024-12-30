@@ -32,20 +32,35 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
           return;
         }
 
-        // Initialize PostHog with more conservative options
+        // Initialize PostHog with the correct configuration
         posthog.init(data.value, {
-          api_host: 'https://app.posthog.com', // Changed from us.i.posthog.com
-          loaded: () => {
+          api_host: 'https://app.posthog.com',
+          loaded: (posthog) => {
+            // Disable automatic capturing of pageviews and clicks for privacy
+            posthog.config.autocapture = false;
+            posthog.config.capture_pageview = false;
+            posthog.config.capture_pageleave = false;
             setIsInitialized(true);
           },
-          capture_pageview: false, // Disable automatic page view capture
-          disable_session_recording: true,
-          autocapture: false,
-          persistence: 'memory', // Use memory persistence to avoid localStorage issues
           bootstrap: {
             distinctID: 'anonymous',
+            isIdentifiedID: false,
           },
+          persistence: 'memory',
+          disable_session_recording: true,
+          disable_persistence: true,
+          secure_cookie: true,
         });
+
+        // Add error handling for PostHog
+        posthog.onFeatureFlags(() => {
+          // Feature flags loaded successfully
+        });
+
+        posthog.onFailedToLoadFeatureFlags(() => {
+          console.warn('Failed to load PostHog feature flags');
+        });
+
       } catch (error) {
         console.error('Error initializing PostHog:', error);
         toast({
@@ -60,7 +75,12 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
 
     return () => {
       if (isInitialized) {
-        posthog.reset();
+        try {
+          posthog.reset();
+          posthog.shutdown();
+        } catch (error) {
+          console.error('Error shutting down PostHog:', error);
+        }
       }
     };
   }, [toast]);
