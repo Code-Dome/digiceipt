@@ -57,10 +57,11 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
           // Feature flags loaded successfully
         });
 
-        // Use reloadFeatureFlags instead of the non-existent onFailedToLoadFeatureFlags
-        posthog.reloadFeatureFlags().catch(() => {
+        try {
+          posthog.reloadFeatureFlags();
+        } catch (error) {
           console.warn('Failed to load PostHog feature flags');
-        });
+        }
 
       } catch (error) {
         console.error('Error initializing PostHog:', error);
