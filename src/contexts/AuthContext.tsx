@@ -41,32 +41,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const validateSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      // Session expired or invalid
+      await logout();
+      return;
+    }
+
+    // Update session and user state
+    setSession(session);
+    setUser(session.user ?? null);
+    setIsAuthenticated(true);
+
+    if (session.user) {
+      const isAdminUser = await checkAdminStatus(session.user.id);
+      setIsAdmin(isAdminUser);
+    }
+  };
+
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAuthenticated(!!session);
-      if (session?.user) {
-        const isAdminUser = await checkAdminStatus(session.user.id);
-        setIsAdmin(isAdminUser);
+    // Initial session fetch
+    validateSession();
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!session) {
+        await logout();
+        return;
       }
+
+      setSession(session);
+      setUser(session.user ?? null);
+      setIsAuthenticated(true);
+      const isAdminUser = await checkAdminStatus(session.user.id);
+      setIsAdmin(isAdminUser);
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAuthenticated(!!session);
-      if (session?.user) {
-        const isAdminUser = await checkAdminStatus(session.user.id);
-        setIsAdmin(isAdminUser);
-      } else {
-        setIsAdmin(false);
+    // Check session validity on tab focus
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        validateSession();
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -74,25 +99,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       email,
       password,
     });
-    
+
     if (error) {
       console.error('Error logging in:', error.message);
       return false;
     }
-    
+
+    await validateSession();
     return true;
   };
 
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-      // Clear any Supabase-related items from localStorage
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith('sb-')) {
-          localStorage.removeItem(key);
-        }
-      }
+      // Clear state and Supabase-related localStorage items
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('sb-')) localStorage.removeItem(key);
+      });
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
@@ -100,18 +123,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
-      // Even if there's an error, try to clean up the state and storage
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith('sb-')) {
-          localStorage.removeItem(key);
-        }
-      }
-      setIsAuthenticated(false);
-      setIsAdmin(false);
-      setSession(null);
-      setUser(null);
-      navigate('/login');
     }
   };
 
