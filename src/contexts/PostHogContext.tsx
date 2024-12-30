@@ -52,12 +52,13 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
           secure_cookie: true,
         });
 
-        // Add error handling for PostHog
+        // Add error handling for PostHog feature flags
         posthog.onFeatureFlags(() => {
           // Feature flags loaded successfully
         });
 
-        posthog.onFailedToLoadFeatureFlags(() => {
+        // Use reloadFeatureFlags instead of the non-existent onFailedToLoadFeatureFlags
+        posthog.reloadFeatureFlags().catch(() => {
           console.warn('Failed to load PostHog feature flags');
         });
 
@@ -76,10 +77,12 @@ export const PostHogProvider = ({ children }: { children: React.ReactNode }) => 
     return () => {
       if (isInitialized) {
         try {
+          // Just use reset() as shutdown() is not available
           posthog.reset();
-          posthog.shutdown();
+          // Clear any remaining data
+          posthog.opt_out_capturing();
         } catch (error) {
-          console.error('Error shutting down PostHog:', error);
+          console.error('Error cleaning up PostHog:', error);
         }
       }
     };
