@@ -43,17 +43,19 @@ export const CompanySettings = () => {
           termsAndConditions: data.terms_and_conditions || ""
         });
       } else {
-        const { error: insertError } = await supabase
+        // Instead of insert, use upsert to handle both insert and update cases
+        const { error: upsertError } = await supabase
           .from('company_settings')
-          .insert({
+          .upsert({
             user_id: user?.id,
             company_name: "",
             address: "",
-            terms_and_conditions: ""
+            terms_and_conditions: "",
+            updated_at: new Date().toISOString()
           });
 
-        if (insertError) {
-          console.error('Error creating default settings:', insertError);
+        if (upsertError) {
+          console.error('Error creating default settings:', upsertError);
           toast({
             title: "Error creating settings",
             description: "Failed to create default company settings.",
