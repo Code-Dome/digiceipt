@@ -16,4 +16,5 @@ export interface DatabaseReceipt {
   removed_custom_fields: Json;
   created_at: string;
   updated_at: string;
+  organization_id: string | null;
 }
