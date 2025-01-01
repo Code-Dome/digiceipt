@@ -42,6 +42,7 @@ export const mapDatabaseToReceipt = (dbReceipt: DatabaseReceipt): Receipt => {
     signature: dbReceipt.signature || "",
     removedFields: Array.isArray(removedFields) ? removedFields.filter((f): f is string => typeof f === 'string') : [],
     removedCustomFields: isCustomFieldArray(removedCustomFields) ? removedCustomFields : [],
+    organizationId: dbReceipt.organization_id,
   };
 };
 
@@ -59,4 +60,5 @@ export const mapReceiptToDatabase = (receipt: Receipt, userId: string): Omit<Dat
   signature: receipt.signature,
   removed_fields: JSON.parse(JSON.stringify(receipt.removedFields)) as Json,
   removed_custom_fields: JSON.parse(JSON.stringify(receipt.removedCustomFields)) as Json,
+  organization_id: receipt.organizationId,
 });
