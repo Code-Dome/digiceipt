@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { v4 as uuidv4 } from "uuid";
 import { Receipt, CustomField, FieldType } from "@/types/receipt";
@@ -10,6 +10,8 @@ import { SignaturePad } from "./SignaturePad";
 import { HeaderSection } from "./ReceiptForm/HeaderSection";
 import { CustomFieldsSection } from "./ReceiptForm/CustomFieldsSection";
 import { defaultFields } from "./ReceiptForm/FieldTypes"; // Add this import
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const generateUniqueInvoiceNo = () => {
   const savedReceipts = JSON.parse(localStorage.getItem("receipts") || "[]");
@@ -33,6 +35,7 @@ const ReceiptForm = ({
   onSave: (receipt: Receipt) => void;
   onUpdate: (receipt: Receipt) => void;
 }) => {
+  const { user } = useAuth();
   const [receipt, setReceipt] = useState<Receipt>(() => ({
     id: initialData?.id || uuidv4(),
     invoiceNo: initialData?.invoiceNo || generateUniqueInvoiceNo(),
@@ -46,11 +49,40 @@ const ReceiptForm = ({
     signature: initialData?.signature || "",
     removedFields: initialData?.removedFields || [],
     removedCustomFields: initialData?.removedCustomFields || [],
+    organizationId: initialData?.organizationId || null,
   }));
 
+  const [userProfile, setUserProfile] = useState<{ organization_id: string | null } | null>(null);
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [showOtherWashType, setShowOtherWashType] = useState(receipt.washType === "Other");
   const [hasFieldErrors, setHasFieldErrors] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user?.id)
+        .single();
+
+      if (error) throw error;
+      setUserProfile(data);
+      if (!initialData) {
+        setReceipt(prev => ({
+          ...prev,
+          organizationId: data.organization_id
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  };
 
   const handleInputChange = (field: keyof Receipt, value: string) => {
     setReceipt((prev) => ({ ...prev, [field]: value }));
@@ -123,7 +155,11 @@ const ReceiptForm = ({
   const handleSave = () => {
     if (sigCanvas.current) {
       const signature = sigCanvas.current.toDataURL();
-      const updatedReceipt = { ...receipt, signature };
+      const updatedReceipt = { 
+        ...receipt, 
+        signature,
+        organizationId: userProfile?.organization_id || null
+      };
       if (initialData?.id) {
         onUpdate(updatedReceipt);
       } else {

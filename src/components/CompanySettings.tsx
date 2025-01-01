@@ -7,24 +7,58 @@ import { useToast } from "./ui/use-toast";
 import { CompanySettings as CompanySettingsType } from "@/types/companySettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Building, Save } from "lucide-react";
+import { Building, Save, Trash2, Users, ChevronDown } from "lucide-react";
 import { Card } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+interface Profile {
+  id: string;
+  username: string | null;
+  organization_id: string | null;
+}
+
+interface Organization {
+  id: string;
+  name: string;
+}
 
 export const CompanySettings = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [settings, setSettings] = useState<CompanySettingsType>({
     companyName: "",
     address: "",
     termsAndConditions: ""
   });
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [users, setUsers] = useState<Profile[]>([]);
 
   useEffect(() => {
     if (user) {
       fetchSettings();
+      if (isAdmin) {
+        fetchOrganizations();
+        fetchUsers();
+      }
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   const fetchSettings = async () => {
     try {
@@ -42,32 +76,49 @@ export const CompanySettings = () => {
           address: data.address || "",
           termsAndConditions: data.terms_and_conditions || ""
         });
-      } else {
-        // Instead of insert, use upsert to handle both insert and update cases
-        const { error: upsertError } = await supabase
-          .from('company_settings')
-          .upsert({
-            user_id: user?.id,
-            company_name: "",
-            address: "",
-            terms_and_conditions: "",
-            updated_at: new Date().toISOString()
-          });
-
-        if (upsertError) {
-          console.error('Error creating default settings:', upsertError);
-          toast({
-            title: "Error creating settings",
-            description: "Failed to create default company settings.",
-            variant: "destructive"
-          });
-        }
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
       toast({
         title: "Error fetching settings",
         description: "Failed to load company settings.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const fetchOrganizations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setOrganizations(data || []);
+    } catch (error) {
+      console.error('Error fetching organizations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load organizations",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, organization_id');
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load users",
         variant: "destructive"
       });
     }
@@ -99,6 +150,44 @@ export const CompanySettings = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleClear = async () => {
+    try {
+      const { error } = await supabase
+        .from('company_settings')
+        .update({
+          company_name: "",
+          address: "",
+          terms_and_conditions: "",
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setSettings({
+        companyName: "",
+        address: "",
+        termsAndConditions: ""
+      });
+
+      toast({
+        title: "Settings cleared",
+        description: "Company settings have been cleared successfully."
+      });
+    } catch (error) {
+      console.error('Error clearing settings:', error);
+      toast({
+        title: "Error clearing settings",
+        description: "Failed to clear company settings.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getUsersInOrganization = (organizationId: string) => {
+    return users.filter(user => user.organization_id === organizationId);
   };
 
   return (
@@ -147,13 +236,70 @@ export const CompanySettings = () => {
             />
           </div>
 
-          <Button 
-            onClick={handleSave}
-            className="w-full"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            Save Settings
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleSave}
+              className="flex-1"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Settings
+            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear Data
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear Company Settings</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to clear all company settings? This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClear} className="bg-destructive text-destructive-foreground">
+                    Clear Settings
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+
+          {isAdmin && (
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Organizations</h3>
+              </div>
+              
+              <Accordion type="single" collapsible className="w-full">
+                {organizations.map((org) => (
+                  <AccordionItem key={org.id} value={org.id}>
+                    <AccordionTrigger className="hover:no-underline">
+                      <span className="flex items-center gap-2">
+                        <Building className="w-4 h-4" />
+                        {org.name}
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2 pl-6">
+                        {getUsersInOrganization(org.id).map((user) => (
+                          <div key={user.id} className="flex items-center gap-2 text-sm">
+                            <Users className="w-4 h-4 text-muted-foreground" />
+                            <span>{user.username || 'Unnamed User'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          )}
         </div>
       </ScrollArea>
     </Card>

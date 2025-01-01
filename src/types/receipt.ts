@@ -13,6 +13,7 @@ export interface Receipt {
   signature: string;
   removedFields?: string[];
   removedCustomFields?: CustomField[];
+  organizationId: string | null;
 }
 
 export interface CustomField {

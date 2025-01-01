@@ -131,6 +131,7 @@ export type Database = {
           horse_reg: string | null
           id: string
           invoice_no: string
+          organization_id: string | null
           other_wash_type: string | null
           removed_custom_fields: Json | null
           removed_fields: Json | null
@@ -148,6 +149,7 @@ export type Database = {
           horse_reg?: string | null
           id?: string
           invoice_no: string
+          organization_id?: string | null
           other_wash_type?: string | null
           removed_custom_fields?: Json | null
           removed_fields?: Json | null
@@ -165,6 +167,7 @@ export type Database = {
           horse_reg?: string | null
           id?: string
           invoice_no?: string
+          organization_id?: string | null
           other_wash_type?: string | null
           removed_custom_fields?: Json | null
           removed_fields?: Json | null
@@ -174,7 +177,15 @@ export type Database = {
           user_id?: string
           wash_type?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "receipts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       secrets: {
         Row: {
