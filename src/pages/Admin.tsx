@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CompanySettingsForm } from "@/components/settings/CompanySettingsForm";
 import { OrganizationList } from "@/components/organization/OrganizationList";
 import { CompanyManagement } from "@/components/CompanyManagement";
+import { UserManagement } from "@/components/UserManagement";
 
 const Admin = () => {
   return (
@@ -15,6 +16,7 @@ const Admin = () => {
           <TabsTrigger value="settings">Company Settings</TabsTrigger>
           <TabsTrigger value="companies">Company Management</TabsTrigger>
           <TabsTrigger value="organizations">Organization Management</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
         </TabsList>
 
         <TabsContent value="settings" className="space-y-4">
@@ -27,6 +29,10 @@ const Admin = () => {
 
         <TabsContent value="organizations" className="space-y-4">
           <OrganizationList />
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-4">
+          <UserManagement />
         </TabsContent>
       </Tabs>
     </div>
