@@ -37,7 +37,7 @@ export const CompanySettingsForm = () => {
         .from('company_settings')
         .select('company_name, address, terms_and_conditions')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error loading settings:', error);
@@ -63,9 +63,16 @@ export const CompanySettingsForm = () => {
 
   const handleSave = async () => {
     try {
+      // First, delete any existing settings for this user
+      await supabase
+        .from('company_settings')
+        .delete()
+        .eq('user_id', user?.id);
+
+      // Then insert the new settings
       const { error } = await supabase
         .from('company_settings')
-        .upsert({
+        .insert({
           user_id: user?.id,
           company_name: settings.companyName,
           address: settings.address,
@@ -93,12 +100,7 @@ export const CompanySettingsForm = () => {
     try {
       const { error } = await supabase
         .from('company_settings')
-        .update({
-          company_name: "",
-          address: "",
-          terms_and_conditions: "",
-          updated_at: new Date().toISOString()
-        })
+        .delete()
         .eq('user_id', user?.id);
 
       if (error) throw error;
