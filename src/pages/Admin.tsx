@@ -3,13 +3,28 @@ import { CompanySettingsForm } from "@/components/settings/CompanySettingsForm";
 import { OrganizationList } from "@/components/organization/OrganizationList";
 import { CompanyManagement } from "@/components/CompanyManagement";
 import { UserManagement } from "@/components/UserManagement";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const Admin = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="container py-6">
-      <h1 className="text-3xl font-bold mb-6 text-violet-700 dark:text-violet-400">
-        Admin Dashboard
-      </h1>
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/')}
+          className="text-violet-700 dark:text-violet-400"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-400">
+          Admin Dashboard
+        </h1>
+      </div>
       
       <Tabs defaultValue="settings" className="space-y-4">
         <TabsList>
