@@ -21,6 +21,7 @@ interface Profile {
   organization: {
     name: string;
   } | null;
+  organization_id: string | null;
 }
 
 export const UserManagement = () => {
@@ -34,6 +35,7 @@ export const UserManagement = () => {
         id, 
         username, 
         is_admin,
+        organization_id,
         organizations (
           name
         )
@@ -50,6 +52,7 @@ export const UserManagement = () => {
       return;
     }
 
+    console.log("Loaded users:", profiles);
     setUsers(profiles || []);
   };
 
@@ -96,7 +99,9 @@ export const UserManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[120px] sm:w-[200px]">Username</TableHead>
-                <TableHead className="hidden sm:table-cell w-[200px]">Organization</TableHead>
+                <TableHead className="hidden sm:table-cell w-[200px]">
+                  Organization
+                </TableHead>
                 <TableHead className="w-[100px] sm:w-[150px]">Admin</TableHead>
               </TableRow>
             </TableHeader>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +28,38 @@ export const CompanySettingsForm = () => {
     address: "",
     termsAndConditions: ""
   });
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('company_settings')
+        .select('company_name, address, terms_and_conditions')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading settings:', error);
+        toast({
+          title: "Error loading settings",
+          description: "Failed to load company settings.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (data) {
+        setSettings({
+          companyName: data.company_name || "",
+          address: data.address || "",
+          termsAndConditions: data.terms_and_conditions || ""
+        });
+      }
+    };
+
+    loadSettings();
+  }, [user]);
 
   const handleSave = async () => {
     try {
