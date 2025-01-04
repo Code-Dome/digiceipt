@@ -112,14 +112,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-      // Clear state and Supabase-related localStorage items
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith('sb-')) localStorage.removeItem(key);
-      });
+      
+      // Check and remove the specific auth token
+      const authToken = localStorage.getItem('sb-dgmdgcsiwatpebuxqnni-auth-token');
+      if (authToken) {
+        localStorage.removeItem('sb-dgmdgcsiwatpebuxqnni-auth-token');
+      }
+      
+      // Clear state
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
       setUser(null);
+      
+      // Redirect to login page
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
