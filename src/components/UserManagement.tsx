@@ -12,16 +12,15 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { Shield, User, Building2 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Profile {
   id: string;
   username: string | null;
   is_admin: boolean;
-  organization: {
+  organization_id: string | null;
+  organizations: {
     name: string;
   } | null;
-  organization_id: string | null;
 }
 
 export const UserManagement = () => {
@@ -36,11 +35,10 @@ export const UserManagement = () => {
         username, 
         is_admin,
         organization_id,
-        organizations (
+        organizations:organizations (
           name
         )
-      `)
-      .returns<Profile[]>();
+      `);
 
     if (error) {
       console.error("Error loading users:", error);
@@ -117,7 +115,7 @@ export const UserManagement = () => {
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-muted-foreground" />
                       <span className="truncate">
-                        {user.organization?.name || "No organization"}
+                        {user.organizations?.name || "No organization"}
                       </span>
                     </div>
                   </TableCell>

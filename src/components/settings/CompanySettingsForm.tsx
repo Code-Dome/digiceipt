@@ -37,7 +37,8 @@ export const CompanySettingsForm = () => {
         .from('company_settings')
         .select('company_name, address, terms_and_conditions')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .limit(1)
+        .single();
 
       if (error) {
         console.error('Error loading settings:', error);
