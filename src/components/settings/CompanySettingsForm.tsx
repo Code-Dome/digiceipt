@@ -1,28 +1,15 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { CompanySettings as CompanySettingsType } from "@/types/companySettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Save, Trash2 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { CompanySettingsFormFields } from "./CompanySettingsFormFields";
+import { CompanySettingsFormSkeleton } from "./CompanySettingsFormSkeleton";
 
 export const CompanySettingsForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
   const [settings, setSettings] = useState<CompanySettingsType>({
     companyName: "",
     address: "",
@@ -57,6 +44,8 @@ export const CompanySettingsForm = () => {
           description: "Failed to load company settings.",
           variant: "destructive"
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -131,73 +120,16 @@ export const CompanySettingsForm = () => {
     }
   };
 
+  if (isLoading) {
+    return <CompanySettingsFormSkeleton />;
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="companyName">Company Name</Label>
-        <Input
-          id="companyName"
-          value={settings.companyName}
-          onChange={(e) => setSettings(prev => ({ ...prev, companyName: e.target.value }))}
-          placeholder="Enter company name"
-          className="bg-background"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
-        <Textarea
-          id="address"
-          value={settings.address}
-          onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
-          placeholder="Enter company address"
-          className="bg-background resize-none h-24"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="termsAndConditions">Terms & Conditions</Label>
-        <Textarea
-          id="termsAndConditions"
-          value={settings.termsAndConditions}
-          onChange={(e) => setSettings(prev => ({ ...prev, termsAndConditions: e.target.value }))}
-          placeholder="Enter terms and conditions"
-          className="bg-background resize-none h-48"
-        />
-      </div>
-
-      <div className="flex gap-2">
-        <Button 
-          onClick={handleSave}
-          className="flex-1"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          Save Settings
-        </Button>
-
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Clear Data
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Clear Company Settings</AlertDialogTitle>
-              <AlertDialogDescription>
-                Are you sure you want to clear all company settings? This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleClear} className="bg-destructive text-destructive-foreground">
-                Clear Settings
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    </div>
+    <CompanySettingsFormFields
+      settings={settings}
+      onSettingsChange={setSettings}
+      onSave={handleSave}
+      onClear={handleClear}
+    />
   );
 };
