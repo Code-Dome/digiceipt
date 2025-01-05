@@ -42,9 +42,9 @@ const Login = () => {
   }, [navigate, toast]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold text-center text-violet-700 dark:text-violet-400 mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-muted dark:bg-gray-900 px-4">
+      <div className="w-full max-w-md p-8 bg-background dark:bg-gray-800 rounded-lg shadow-lg">
+        <h1 className="text-2xl font-bold text-center text-primary dark:text-primary mb-6">
           Digital Receipts Login
         </h1>
         <Auth
@@ -54,8 +54,8 @@ const Login = () => {
             variables: {
               default: {
                 colors: {
-                  brand: '#8b5cf6',
-                  brandAccent: '#7c3aed',
+                  brand: 'hsl(var(--primary))',
+                  brandAccent: 'hsl(var(--primary))',
                 },
               },
             },
@@ -75,7 +75,7 @@ const Login = () => {
                 pointerEvents: 'auto',
               },
               anchor: {
-                color: '#8b5cf6',
+                color: 'hsl(var(--primary))',
               },
             },
           }}
