@@ -11,15 +11,15 @@ const Stats = () => {
   return (
     <div className="container py-4 md:py-8 px-4 md:px-6">
       <div className="flex items-center gap-4 mb-6">
-        <Button
-          variant="outline"
+        <Button 
+          variant="outline" 
           onClick={() => navigate("/")}
-          className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+          className="bg-background hover:bg-muted text-primary"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-2xl md:text-3xl font-bold text-violet-700 dark:text-violet-400">
+        <h1 className="text-2xl md:text-3xl font-bold text-primary">
           Statistics Dashboard
         </h1>
       </div>

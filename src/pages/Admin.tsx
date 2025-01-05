@@ -14,14 +14,14 @@ const Admin = () => {
     <div className="container py-6">
       <div className="flex items-center gap-4 mb-6">
         <Button 
-          variant="ghost" 
+          variant="outline" 
           onClick={() => navigate('/')}
-          className="text-violet-700 dark:text-violet-400"
+          className="bg-background hover:bg-muted text-primary"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-3xl font-bold text-violet-700 dark:text-violet-400">
+        <h1 className="text-3xl font-bold text-primary">
           Admin Dashboard
         </h1>
       </div>
