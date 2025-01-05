@@ -18,18 +18,26 @@ export const CompanySettingsForm = () => {
 
   useEffect(() => {
     const loadSettings = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
+        console.log('Loading settings for user:', user.id);
         const { data, error } = await supabase
           .from('company_settings')
-          .select('*')
+          .select('company_name, address, terms_and_conditions')
           .eq('user_id', user.id)
-          .limit(1)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error loading settings:', error);
+          throw error;
+        }
 
+        console.log('Loaded settings:', data);
+        
         if (data) {
           setSettings({
             companyName: data.company_name || "",
@@ -56,16 +64,10 @@ export const CompanySettingsForm = () => {
     if (!user) return;
 
     try {
-      // First, delete any existing settings for this user
-      await supabase
-        .from('company_settings')
-        .delete()
-        .eq('user_id', user.id);
-
-      // Then insert the new settings
+      console.log('Saving settings:', settings);
       const { error } = await supabase
         .from('company_settings')
-        .insert({
+        .upsert({
           user_id: user.id,
           company_name: settings.companyName,
           address: settings.address,
