@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAdminStatus = async (userId: string) => {
     try {
+      console.log('Checking admin status for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('is_admin')
@@ -34,6 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return false;
       }
 
+      console.log('Admin status result:', data);
       return data?.is_admin || false;
     } catch (error) {
       console.error('Error in checkAdminStatus:', error);
@@ -56,6 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (session.user) {
         const isAdminUser = await checkAdminStatus(session.user.id);
+        console.log('Setting admin status:', isAdminUser);
         setIsAdmin(isAdminUser);
       }
     } catch (error) {
@@ -65,10 +68,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    // Initial session check
     validateSession();
 
-    // Subscribe to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!session) {
         await logout();
@@ -81,18 +82,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (session.user) {
         const isAdminUser = await checkAdminStatus(session.user.id);
+        console.log('Setting admin status on auth change:', isAdminUser);
         setIsAdmin(isAdminUser);
       }
     });
 
-    // Check session validity on tab focus
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         validateSession();
       }
     };
 
-    // Check session validity on window focus
     const handleFocus = () => {
       validateSession();
     };
@@ -131,21 +131,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await supabase.auth.signOut();
       
-      // Clear all auth-related storage
       localStorage.removeItem('sb-dgmdgcsiwatpebuxqnni-auth-token');
       localStorage.removeItem('supabase.auth.token');
       
-      // Reset state
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
       setUser(null);
       
-      // Redirect to login page
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
-      // Force a hard reset of auth state even if there's an error
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
