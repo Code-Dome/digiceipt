@@ -42,27 +42,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const validateSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        await logout();
+        return;
+      }
 
-    if (!session) {
-      // Session expired or invalid
+      setSession(session);
+      setUser(session.user);
+      setIsAuthenticated(true);
+
+      if (session.user) {
+        const isAdminUser = await checkAdminStatus(session.user.id);
+        setIsAdmin(isAdminUser);
+      }
+    } catch (error) {
+      console.error('Error validating session:', error);
       await logout();
-      return;
-    }
-
-    // Update session and user state
-    setSession(session);
-    setUser(session.user ?? null);
-    setIsAuthenticated(true);
-
-    if (session.user) {
-      const isAdminUser = await checkAdminStatus(session.user.id);
-      setIsAdmin(isAdminUser);
     }
   };
 
   useEffect(() => {
-    // Initial session fetch
+    // Initial session check
     validateSession();
 
     // Subscribe to auth state changes
@@ -73,10 +76,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       setSession(session);
-      setUser(session.user ?? null);
+      setUser(session.user);
       setIsAuthenticated(true);
-      const isAdminUser = await checkAdminStatus(session.user.id);
-      setIsAdmin(isAdminUser);
+      
+      if (session.user) {
+        const isAdminUser = await checkAdminStatus(session.user.id);
+        setIsAdmin(isAdminUser);
+      }
     });
 
     // Check session validity on tab focus
@@ -86,40 +92,50 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
+    // Check session validity on window focus
+    const handleFocus = () => {
+      validateSession();
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
 
     return () => {
       subscription.unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
     };
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      console.error('Error logging in:', error.message);
+      if (error) {
+        console.error('Error logging in:', error.message);
+        return false;
+      }
+
+      await validateSession();
+      return true;
+    } catch (error) {
+      console.error('Error in login:', error);
       return false;
     }
-
-    await validateSession();
-    return true;
   };
 
   const logout = async () => {
     try {
       await supabase.auth.signOut();
       
-      // Check and remove the specific auth token
-      const authToken = localStorage.getItem('sb-dgmdgcsiwatpebuxqnni-auth-token');
-      if (authToken) {
-        localStorage.removeItem('sb-dgmdgcsiwatpebuxqnni-auth-token');
-      }
+      // Clear all auth-related storage
+      localStorage.removeItem('sb-dgmdgcsiwatpebuxqnni-auth-token');
+      localStorage.removeItem('supabase.auth.token');
       
-      // Clear state
+      // Reset state
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
@@ -129,6 +145,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
+      // Force a hard reset of auth state even if there's an error
+      setIsAuthenticated(false);
+      setIsAdmin(false);
+      setSession(null);
+      setUser(null);
+      navigate('/login');
     }
   };
 
