@@ -20,7 +20,6 @@ const Archive = () => {
 
   const onUnarchive = async (receipt: Receipt) => {
     await handleUnarchive(receipt);
-    // Refresh both archived and active receipts lists
     loadArchivedReceipts();
     loadReceipts();
     
@@ -32,7 +31,7 @@ const Archive = () => {
 
   const onDelete = async (receipt: Receipt) => {
     await handleDelete(receipt);
-    loadArchivedReceipts(); // Refresh archived receipts list
+    loadArchivedReceipts();
     
     toast({
       title: "Receipt Deleted",
@@ -47,12 +46,12 @@ const Archive = () => {
           <Button 
             variant="outline" 
             onClick={() => navigate('/view')}
-            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+            className="bg-background hover:bg-muted text-primary border-input"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Active Receipts
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold text-violet-700 dark:text-violet-400">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary">
             Archived Receipts
           </h1>
         </div>

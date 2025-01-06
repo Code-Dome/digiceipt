@@ -7,11 +7,20 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { mapReceiptToDatabase } from "@/utils/receiptMapper";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 const Create = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { session } = useAuth();
+  const [showNoOrgDialog, setShowNoOrgDialog] = useState(false);
 
   const handleSave = async (receipt: Receipt) => {
     if (!session?.user?.id) {
@@ -20,6 +29,18 @@ const Create = () => {
         description: "You must be logged in to create receipts",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check if user has an organization
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', session.user.id)
+      .single();
+
+    if (!userProfile?.organization_id) {
+      setShowNoOrgDialog(true);
       return;
     }
 
@@ -68,21 +89,32 @@ const Create = () => {
   };
 
   return (
-    <div className="container px-4 sm:px-6 py-4 sm:py-8 dark:bg-gray-900">
+    <div className="container px-4 sm:px-6 py-4 sm:py-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <Button
           variant="outline"
           onClick={() => navigate("/")}
-          className="w-full sm:w-auto bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+          className="w-full sm:w-auto bg-background hover:bg-muted text-primary border-input"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-2xl sm:text-3xl font-bold text-violet-700 dark:text-violet-400">
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary">
           Create Receipt
         </h1>
       </div>
       <ReceiptForm onSave={handleSave} onUpdate={() => {}} />
+
+      <Dialog open={showNoOrgDialog} onOpenChange={setShowNoOrgDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-primary">Organization Required</DialogTitle>
+            <DialogDescription>
+              You need to be part of an organization to create receipts. Please contact your administrator to be added to an organization.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

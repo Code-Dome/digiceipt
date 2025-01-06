@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { InvoiceTable } from "@/components/InvoiceList/InvoiceTable";
 import { InvoiceFilters } from "@/components/InvoiceList/InvoiceFilters";
 import { usePostHog } from "@/contexts/PostHogContext";
@@ -28,7 +28,6 @@ const View = () => {
   }, [posthog, loadReceipts]);
 
   const handleEditReceipt = (receipt: Receipt) => {
-    // Store the receipt data in localStorage for editing
     localStorage.setItem("editReceipt", JSON.stringify(receipt));
     navigate("/create");
   };
@@ -60,19 +59,19 @@ const View = () => {
           <Button
             variant="outline"
             onClick={() => navigate("/")}
-            className="bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+            className="bg-background hover:bg-muted text-primary border-input"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
-          <h1 className="text-2xl md:text-3xl font-bold text-violet-700 dark:text-violet-400">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary">
             View Receipts
           </h1>
         </div>
         <Button
           variant="outline"
           onClick={handleArchiveClick}
-          className="w-full md:w-auto bg-white hover:bg-violet-50 text-violet-700 border-violet-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-violet-400 dark:border-gray-600"
+          className="w-full md:w-auto bg-background hover:bg-muted text-primary border-input"
         >
           <Archive className="w-4 h-4 mr-2" />
           View Archive
