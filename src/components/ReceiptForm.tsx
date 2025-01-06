@@ -169,7 +169,7 @@ const ReceiptForm = ({
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto dark:bg-gray-800 dark:border-gray-700">
+    <Card className="w-full max-w-3xl mx-auto bg-background border-border">
       <CardContent className="p-4 sm:p-6">
         <div className="space-y-6">
           <HeaderSection 
@@ -179,7 +179,7 @@ const ReceiptForm = ({
 
           <div className="grid gap-6">
             <DefaultFields
-              fields={defaultFields} // Use the imported defaultFields
+              fields={defaultFields}
               values={receipt}
               removedFields={receipt.removedFields || []}
               onInputChange={handleInputChange}
@@ -189,7 +189,7 @@ const ReceiptForm = ({
             <RestoreFields
               removedFields={receipt.removedFields || []}
               removedCustomFields={receipt.removedCustomFields || []}
-              defaultFields={defaultFields} // Use the imported defaultFields
+              defaultFields={defaultFields}
               onRestoreField={restoreDefaultField}
               onRestoreCustomField={restoreCustomField}
             />
@@ -210,7 +210,7 @@ const ReceiptForm = ({
 
             <Button 
               onClick={handleSave} 
-              className="w-full sm:w-auto mt-4 bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-700 dark:hover:bg-violet-800"
+              className="w-full sm:w-auto mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
               disabled={hasFieldErrors}
             >
               {initialData?.id ? "Update Receipt" : "Save Receipt"}

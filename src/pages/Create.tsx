@@ -32,7 +32,6 @@ const Create = () => {
       return;
     }
 
-    // Check if user has an organization
     const { data: userProfile } = await supabase
       .from('profiles')
       .select('organization_id')
@@ -90,11 +89,11 @@ const Create = () => {
 
   return (
     <div className="container px-4 sm:px-6 py-4 sm:py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <Button
           variant="outline"
           onClick={() => navigate("/")}
-          className="w-full sm:w-auto bg-background hover:bg-muted text-primary border-input"
+          className="w-full sm:w-auto bg-background hover:bg-muted text-foreground border-input"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
@@ -108,8 +107,8 @@ const Create = () => {
       <Dialog open={showNoOrgDialog} onOpenChange={setShowNoOrgDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-primary">Organization Required</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-foreground">Organization Required</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               You need to be part of an organization to create receipts. Please contact your administrator to be added to an organization.
             </DialogDescription>
           </DialogHeader>
