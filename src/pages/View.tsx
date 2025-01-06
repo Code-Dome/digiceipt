@@ -54,7 +54,7 @@ const View = () => {
 
   return (
     <div className="container py-4 md:py-8 px-4 md:px-6">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"

@@ -100,21 +100,21 @@ export const InvoiceTable = ({
   };
 
   return (
-    <div className="rounded-md border border-violet-200">
+    <div className="rounded-md border border-input">
       <Table>
         <InvoiceTableHeader customFieldLabels={customFieldLabels} />
         <TableBody>
           {invoices.map((invoice) => (
-            <TableRow key={invoice.id}>
-              <TableCell className="font-medium">{invoice.invoiceNo}</TableCell>
-              <TableCell>{formatDate(invoice.timestamp)}</TableCell>
-              <TableCell>{invoice.driverName}</TableCell>
-              <TableCell>{invoice.companyName}</TableCell>
-              <TableCell>{invoice.washType}</TableCell>
+            <TableRow key={invoice.id} className="hover:bg-muted/50">
+              <TableCell className="font-medium text-foreground">{invoice.invoiceNo}</TableCell>
+              <TableCell className="text-foreground">{formatDate(invoice.timestamp)}</TableCell>
+              <TableCell className="text-foreground">{invoice.driverName}</TableCell>
+              <TableCell className="text-foreground">{invoice.companyName}</TableCell>
+              <TableCell className="text-foreground">{invoice.washType}</TableCell>
               {customFieldLabels.map(label => (
                 <TableCell 
                   key={label}
-                  className={!getCustomFieldValue(invoice, label) ? "text-gray-300" : ""}
+                  className={!getCustomFieldValue(invoice, label) ? "text-muted-foreground" : "text-foreground"}
                 >
                   {getCustomFieldValue(invoice, label) || "N/A"}
                 </TableCell>
