@@ -23,7 +23,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAdminStatus = async (userId: string) => {
     try {
-      console.log('Checking admin status for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('is_admin')
@@ -35,7 +34,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return false;
       }
 
-      console.log('Admin status result:', data);
       return data?.is_admin || false;
     } catch (error) {
       console.error('Error in checkAdminStatus:', error);
@@ -46,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const validateSession = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         await logout();
         return;
@@ -58,7 +56,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (session.user) {
         const isAdminUser = await checkAdminStatus(session.user.id);
-        console.log('Setting admin status:', isAdminUser);
         setIsAdmin(isAdminUser);
       }
     } catch (error) {
@@ -79,10 +76,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session.user);
       setIsAuthenticated(true);
-      
+
       if (session.user) {
         const isAdminUser = await checkAdminStatus(session.user.id);
-        console.log('Setting admin status on auth change:', isAdminUser);
         setIsAdmin(isAdminUser);
       }
     });
@@ -109,13 +105,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        console.error('Error logging in:', error.message);
+      if (error || !data.session) {
+        console.error('Error logging in:', error?.message);
         return false;
       }
 
@@ -130,23 +126,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-      
-      localStorage.removeItem('sb-dgmdgcsiwatpebuxqnni-auth-token');
-      localStorage.removeItem('supabase.auth.token');
-      
+
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
       setUser(null);
-      
-      navigate('/login');
+
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Error during logout:', error);
+
       setIsAuthenticated(false);
       setIsAdmin(false);
       setSession(null);
       setUser(null);
-      navigate('/login');
+
+      navigate('/login', { replace: true });
     }
   };
 
