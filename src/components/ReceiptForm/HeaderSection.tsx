@@ -23,10 +23,10 @@ export const HeaderSection = ({ invoiceNo, timestamp }: HeaderSectionProps) => {
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
       <div>
-        <p className="font-semibold text-violet-700 dark:text-violet-400 text-lg">
+        <p className="font-semibold text-primary text-lg">
           Invoice #{invoiceNo}
         </p>
-        <p className="text-sm text-violet-500 dark:text-violet-300">
+        <p className="text-sm text-muted-foreground">
           {formatDate(timestamp)}
         </p>
       </div>

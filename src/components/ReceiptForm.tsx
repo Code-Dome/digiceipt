@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { v4 as uuidv4 } from "uuid";
 import { Receipt, CustomField, FieldType } from "@/types/receipt";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DefaultFields } from "./DefaultFields";
 import { RestoreFields } from "./RestoreFields";
 import { SignaturePad } from "./SignaturePad";
 import { HeaderSection } from "./ReceiptForm/HeaderSection";
 import { CustomFieldsSection } from "./ReceiptForm/CustomFieldsSection";
-import { defaultFields } from "./ReceiptForm/FieldTypes"; // Add this import
+import { FormActions } from "./ReceiptForm/FormActions";
+import { defaultFields } from "./ReceiptForm/FieldTypes";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -169,8 +169,8 @@ const ReceiptForm = ({
   };
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-background border-border">
-      <CardContent className="p-4 sm:p-6">
+    <Card className="w-full max-w-3xl mx-auto bg-background">
+      <CardContent className="p-6">
         <div className="space-y-6">
           <HeaderSection 
             invoiceNo={receipt.invoiceNo} 
@@ -208,18 +208,12 @@ const ReceiptForm = ({
               initialSignature={initialData?.signature}
             />
 
-            <Button 
-              onClick={handleSave} 
-              className="w-full sm:w-auto mt-4 bg-primary hover:bg-primary/90 text-primary-foreground"
-              disabled={hasFieldErrors}
-            >
-              {initialData?.id ? "Update Receipt" : "Save Receipt"}
-            </Button>
-            {hasFieldErrors && (
-              <p className="text-sm text-destructive mt-2">
-                Please fix the duplicate options in your custom fields before saving.
-              </p>
-            )}
+            <FormActions
+              sigCanvas={sigCanvas}
+              onSave={handleSave}
+              hasFieldErrors={hasFieldErrors}
+              isEditing={!!initialData?.id}
+            />
           </div>
         </div>
       </CardContent>

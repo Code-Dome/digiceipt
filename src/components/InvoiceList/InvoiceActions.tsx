@@ -40,43 +40,43 @@ export const InvoiceActions = ({
         variant="ghost"
         size="icon"
         onClick={() => onEdit(invoice)}
-        className="hover:bg-violet-100"
+        className="hover:bg-accent"
       >
-        <Edit className="h-4 w-4 text-violet-700" />
+        <Edit className="h-4 w-4 text-primary" />
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={() => onPrint(invoice)}
-        className="hover:bg-violet-100"
+        className="hover:bg-accent"
       >
-        <Printer className="h-4 w-4 text-violet-700" />
+        <Printer className="h-4 w-4 text-primary" />
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={() => onDownload(invoice)}
-        className="hover:bg-violet-100"
+        className="hover:bg-accent"
       >
-        <Download className="h-4 w-4 text-violet-700" />
+        <Download className="h-4 w-4 text-primary" />
       </Button>
       {isArchivePage ? (
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onUnarchive(invoice)}
-          className="hover:bg-violet-100"
+          className="hover:bg-accent"
         >
-          <RotateCcw className="h-4 w-4 text-violet-700" />
+          <RotateCcw className="h-4 w-4 text-primary" />
         </Button>
       ) : (
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onArchive(invoice)}
-          className="hover:bg-violet-100"
+          className="hover:bg-accent"
         >
-          <Archive className="h-4 w-4 text-violet-700" />
+          <Archive className="h-4 w-4 text-primary" />
         </Button>
       )}
       <AlertDialog>
@@ -84,9 +84,9 @@ export const InvoiceActions = ({
           <Button
             variant="ghost"
             size="icon"
-            className="hover:bg-red-100"
+            className="hover:bg-destructive/10"
           >
-            <Trash2 className="h-4 w-4 text-red-700" />
+            <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
@@ -100,7 +100,7 @@ export const InvoiceActions = ({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => onDelete(invoice)}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-destructive hover:bg-destructive/90"
             >
               Delete
             </AlertDialogAction>
