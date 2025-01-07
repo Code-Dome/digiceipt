@@ -47,12 +47,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Error getting session:', error);
-        await logout();
+        await handleLogout();
         return;
       }
 
       if (!session) {
-        await logout();
+        await handleLogout();
         return;
       }
 
@@ -66,8 +66,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Error in validateSession:', error);
-      await logout();
+      await handleLogout();
     }
+  };
+
+  const handleLogout = async () => {
+    // Clear state first
+    setIsAuthenticated(false);
+    setIsAdmin(false);
+    setSession(null);
+    setUser(null);
+
+    // Clear all Supabase-related items from localStorage
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    // Force navigation to login page
+    navigate('/login', { replace: true });
   };
 
   useEffect(() => {
@@ -79,13 +97,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
       if (event === 'SIGNED_OUT') {
-        await logout();
+        await handleLogout();
         return;
       }
 
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         if (!session) {
-          await logout();
+          await handleLogout();
           return;
         }
 
@@ -137,25 +155,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      // First sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error during Supabase signOut:', error);
+      }
       
-      // Clear all Supabase-related items from localStorage
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('sb-')) {
-          localStorage.removeItem(key);
-        }
-      });
-      
-      // Clear state
-      setIsAuthenticated(false);
-      setIsAdmin(false);
-      setSession(null);
-      setUser(null);
-      
-      // Redirect to login page
-      navigate('/login');
+      // Then handle the local logout
+      await handleLogout();
     } catch (error) {
       console.error('Error during logout:', error);
+      // Even if there's an error, attempt to handle local logout
+      await handleLogout();
     }
   };
 
