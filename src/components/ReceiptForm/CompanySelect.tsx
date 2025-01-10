@@ -11,7 +11,7 @@ export const CompanySelect = ({ value, onChange }: CompanySelectProps) => {
 
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="bg-white dark:bg-gray-800">
+      <SelectTrigger className="bg-background">
         <SelectValue placeholder="Select company" />
       </SelectTrigger>
       <SelectContent>

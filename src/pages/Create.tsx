@@ -88,27 +88,30 @@ const Create = () => {
   };
 
   return (
-    <div className="container px-4 sm:px-6 py-4 sm:py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div className="container max-w-7xl mx-auto px-4 py-4 md:py-8 space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Button
           variant="outline"
           onClick={() => navigate("/")}
-          className="w-full sm:w-auto bg-background hover:bg-muted text-foreground border-input"
+          className="w-full md:w-auto"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-2xl sm:text-3xl font-bold text-primary">
+        <h1 className="text-2xl md:text-3xl font-bold text-primary">
           Create Receipt
         </h1>
       </div>
-      <ReceiptForm onSave={handleSave} onUpdate={() => {}} />
+      
+      <div className="w-full max-w-3xl mx-auto">
+        <ReceiptForm onSave={handleSave} onUpdate={() => {}} />
+      </div>
 
       <Dialog open={showNoOrgDialog} onOpenChange={setShowNoOrgDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-foreground">Organization Required</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
+            <DialogTitle>Organization Required</DialogTitle>
+            <DialogDescription>
               You need to be part of an organization to create receipts. Please contact your administrator to be added to an organization.
             </DialogDescription>
           </DialogHeader>

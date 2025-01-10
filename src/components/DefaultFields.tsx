@@ -27,7 +27,9 @@ export const DefaultFields = ({
           !removedFields.includes(key) && (
             <div key={key} className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor={key}>{label}</Label>
+                <Label htmlFor={key} className="text-foreground">
+                  {label}
+                </Label>
                 <Button
                   type="button"
                   variant="ghost"
@@ -48,7 +50,7 @@ export const DefaultFields = ({
                   value={values[key]}
                   onValueChange={(value) => onInputChange(key, value)}
                 >
-                  <SelectTrigger className="bg-white dark:bg-gray-800">
+                  <SelectTrigger className="bg-background">
                     <SelectValue placeholder="Select wash type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -62,7 +64,7 @@ export const DefaultFields = ({
                   id={key}
                   value={values[key as keyof Receipt] as string || ""}
                   onChange={(e) => onInputChange(key, e.target.value)}
-                  className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  className="bg-background"
                 />
               )}
             </div>
