@@ -18,6 +18,24 @@ const Login = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
+    // Check for password reset hash in URL
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    const accessToken = hashParams.get('access_token');
+
+    if (type === 'recovery' && accessToken) {
+      // Remove the hash from the URL to prevent issues with subsequent navigation
+      window.location.hash = '';
+      
+      // Show a toast to guide the user
+      toast({
+        title: "Password Reset",
+        description: "Please enter your new password below.",
+      });
+    }
+  }, [toast]);
+
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         navigate('/');
@@ -25,14 +43,15 @@ const Login = () => {
         navigate('/login');
       } else if (event === 'PASSWORD_RECOVERY') {
         toast({
-          title: "Password Recovery",
+          title: "Password Recovery Email Sent",
           description: "Please check your email for password reset instructions.",
         });
       } else if (event === 'USER_UPDATED') {
         toast({
-          title: "Profile Updated",
-          description: "Your profile has been successfully updated.",
+          title: "Password Updated",
+          description: "Your password has been successfully updated. You can now log in with your new password.",
         });
+        navigate('/login');
       }
     });
 
@@ -86,6 +105,14 @@ const Login = () => {
               sign_in: {
                 email_label: 'Email',
                 password_label: 'Password',
+              },
+              forgotten_password: {
+                email_label: 'Email',
+                button_label: 'Send Reset Instructions',
+              },
+              update_password: {
+                password_label: 'New Password',
+                button_label: 'Update Password',
               },
             },
           }}
