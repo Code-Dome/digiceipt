@@ -18,13 +18,15 @@ const Login = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    // Check for password reset hash in URL and redirect if found
+    // Check URL hash for password reset token
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get('type');
     const accessToken = hashParams.get('access_token');
 
     if (type === 'recovery' && accessToken) {
+      // If we find a recovery token, redirect to reset password page with the hash intact
       navigate('/reset-password' + window.location.hash);
+      return;
     }
   }, [navigate]);
 
@@ -32,8 +34,6 @@ const Login = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         navigate('/');
-      } else if (event === 'SIGNED_OUT') {
-        navigate('/login');
       } else if (event === 'PASSWORD_RECOVERY') {
         toast({
           title: "Password Recovery Email Sent",
