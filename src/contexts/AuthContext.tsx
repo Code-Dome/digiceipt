@@ -19,6 +19,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<{ user: { id: string; email: string } } | null>(null);
   const navigate = useNavigate();
 
+  // Using a valid UUID format for the mock admin user
+  const MOCK_ADMIN_UUID = 'd7bed21c-5a38-4c51-87d6-c8c6f129e84d';
+
   useEffect(() => {
     // Check if user is already logged in
     const authStatus = localStorage.getItem('isAuthenticated');
@@ -26,7 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAuthenticated(true);
       setIsAdmin(true);
       // Set mock user and session data for admin/admin auth
-      const mockUser = { id: 'admin-user-id', email: 'admin@example.com' };
+      const mockUser = { id: MOCK_ADMIN_UUID, email: 'admin@example.com' };
       setUser(mockUser);
       setSession({ user: mockUser });
     }
@@ -35,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (username: string, password: string) => {
     // Simple authentication logic for demo
     if (username === 'admin' && password === 'admin') {
-      const mockUser = { id: 'admin-user-id', email: 'admin@example.com' };
+      const mockUser = { id: MOCK_ADMIN_UUID, email: 'admin@example.com' };
       setIsAuthenticated(true);
       setIsAdmin(true);
       setUser(mockUser);
