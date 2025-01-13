@@ -16,59 +16,68 @@ export const useReceipts = () => {
   const loadReceipts = useCallback(async () => {
     if (!session?.user?.id) return;
 
-    // First get the user's profile to check organization
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('organization_id, is_admin')
-      .eq('id', session.user.id)
-      .maybeSingle();
+    try {
+      // First get the user's profile to check organization
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('organization_id, is_admin')
+        .eq('id', session.user.id)
+        .maybeSingle();
 
-    if (profileError) {
-      console.error('Error loading profile:', profileError);
+      if (profileError) {
+        console.error('Error loading profile:', profileError);
+        toast({
+          title: 'Error loading profile',
+          description: profileError.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // If no profile found, show a message and return
+      if (!profileData) {
+        console.error('No profile found for user');
+        toast({
+          title: 'Profile not found',
+          description: 'Your user profile could not be found. Please contact support.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      let query = supabase
+        .from('receipts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      // If user is not admin, filter by their organization
+      if (!profileData.is_admin && profileData.organization_id) {
+        query = query.eq('organization_id', profileData.organization_id);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error loading receipts:', error);
+        toast({
+          title: 'Error loading receipts',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const mappedReceipts = (data as DatabaseReceipt[]).map(mapDatabaseToReceipt);
+      setReceipts(mappedReceipts);
+      setFilteredReceipts(mappedReceipts);
+    } catch (error) {
+      console.error('Unexpected error:', error);
       toast({
-        title: 'Error loading profile',
-        description: profileError.message,
+        title: 'Error',
+        description: 'An unexpected error occurred while loading receipts.',
         variant: 'destructive',
       });
-      return;
     }
-
-    // If no profile found, show a message and return
-    if (!profileData) {
-      console.error('No profile found for user');
-      toast({
-        title: 'Profile not found',
-        description: 'Your user profile could not be found. Please contact support.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    let query = supabase
-      .from('receipts')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    // If user is not admin, filter by their organization
-    if (!profileData.is_admin && profileData.organization_id) {
-      query = query.eq('organization_id', profileData.organization_id);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error loading receipts:', error);
-      toast({
-        title: 'Error loading receipts',
-        description: error.message,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const mappedReceipts = (data as DatabaseReceipt[]).map(mapDatabaseToReceipt);
-    setReceipts(mappedReceipts);
-    setFilteredReceipts(mappedReceipts);
   }, [session?.user?.id, toast]);
 
   useEffect(() => {
@@ -76,58 +85,76 @@ export const useReceipts = () => {
   }, [loadReceipts]);
 
   const handleArchive = async (receipt: Receipt) => {
-    // For now, we'll keep the archive functionality in localStorage
-    const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
-    archivedReceipts.push(receipt);
-    localStorage.setItem("archivedReceipts", JSON.stringify(archivedReceipts));
-    
-    const { error } = await supabase
-      .from('receipts')
-      .delete()
-      .eq('id', receipt.id);
+    try {
+      // For now, we'll keep the archive functionality in localStorage
+      const archivedReceipts = JSON.parse(localStorage.getItem("archivedReceipts") || "[]") as Receipt[];
+      archivedReceipts.push(receipt);
+      localStorage.setItem("archivedReceipts", JSON.stringify(archivedReceipts));
+      
+      const { error } = await supabase
+        .from('receipts')
+        .delete()
+        .eq('id', receipt.id);
 
-    if (error) {
-      console.error('Error archiving receipt:', error);
+      if (error) {
+        console.error('Error archiving receipt:', error);
+        toast({
+          title: 'Error archiving receipt',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      await loadReceipts();
+      
       toast({
-        title: 'Error archiving receipt',
-        description: error.message,
+        title: "Receipt archived",
+        description: `Invoice #${receipt.invoiceNo} has been archived.`,
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Unexpected error during archive:', error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred while archiving the receipt.',
         variant: 'destructive',
       });
-      return;
     }
-
-    await loadReceipts();
-    
-    toast({
-      title: "Receipt archived",
-      description: `Invoice #${receipt.invoiceNo} has been archived.`,
-      duration: 2000,
-    });
   };
 
   const handleDelete = async (receipt: Receipt) => {
-    const { error } = await supabase
-      .from('receipts')
-      .delete()
-      .eq('id', receipt.id);
+    try {
+      const { error } = await supabase
+        .from('receipts')
+        .delete()
+        .eq('id', receipt.id);
 
-    if (error) {
-      console.error('Error deleting receipt:', error);
+      if (error) {
+        console.error('Error deleting receipt:', error);
+        toast({
+          title: 'Error deleting receipt',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      await loadReceipts();
+      
       toast({
-        title: 'Error deleting receipt',
-        description: error.message,
+        title: "Receipt deleted",
+        description: `Invoice #${receipt.invoiceNo} has been deleted.`,
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Unexpected error during delete:', error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred while deleting the receipt.',
         variant: 'destructive',
       });
-      return;
     }
-
-    await loadReceipts();
-    
-    toast({
-      title: "Receipt deleted",
-      description: `Invoice #${receipt.invoiceNo} has been deleted.`,
-      duration: 2000,
-    });
   };
 
   const handleFilterChange = useCallback((filters: Record<string, string>) => {
