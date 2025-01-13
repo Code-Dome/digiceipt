@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
+  user: { id: string } | null;
+  session: { user: { id: string } } | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -13,6 +15,8 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState<{ id: string } | null>(null);
+  const [session, setSession] = useState<{ user: { id: string } } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,6 +25,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (authStatus === 'true') {
       setIsAuthenticated(true);
       setIsAdmin(true);
+      // Set mock user and session data for admin/admin auth
+      const mockUser = { id: 'admin-user-id' };
+      setUser(mockUser);
+      setSession({ user: mockUser });
     }
   }, []);
 
@@ -29,6 +37,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (username === 'admin' && password === 'admin') {
       setIsAuthenticated(true);
       setIsAdmin(true);
+      // Set mock user and session data
+      const mockUser = { id: 'admin-user-id' };
+      setUser(mockUser);
+      setSession({ user: mockUser });
       localStorage.setItem('isAuthenticated', 'true');
       return true;
     }
@@ -38,12 +50,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     setIsAuthenticated(false);
     setIsAdmin(false);
+    setUser(null);
+    setSession(null);
     localStorage.removeItem('isAuthenticated');
     navigate('/login', { replace: true });
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      isAdmin, 
+      user,
+      session,
+      login, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );
