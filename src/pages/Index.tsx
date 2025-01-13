@@ -2,14 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Plus, FileText, LogOut, Settings, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { usePostHog } from "@/contexts/PostHogContext";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { useEffect } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { logout, isAdmin, isAuthenticated } = useAuth();
-  const posthog = usePostHog();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -18,27 +16,22 @@ const Index = () => {
   }, [isAuthenticated, navigate]);
 
   const handleCreateClick = () => {
-    posthog.capture('create_receipt_clicked');
     navigate("/create");
   };
 
   const handleViewClick = () => {
-    posthog.capture('view_receipts_clicked');
     navigate("/view");
   };
 
   const handleStatsClick = () => {
-    posthog.capture('stats_page_accessed');
     navigate("/stats");
   };
 
   const handleSettingsClick = () => {
-    posthog.capture('settings_page_accessed');
     navigate("/admin");
   };
 
   const handleLogout = async () => {
-    posthog.capture('user_logged_out');
     await logout();
   };
 
