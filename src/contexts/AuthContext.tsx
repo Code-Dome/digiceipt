@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
-  user: { id: string } | null;
-  session: { user: { id: string } } | null;
+  user: { id: string; email: string } | null;
+  session: { user: { id: string; email: string } } | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -15,8 +15,8 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser] = useState<{ id: string } | null>(null);
-  const [session, setSession] = useState<{ user: { id: string } } | null>(null);
+  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+  const [session, setSession] = useState<{ user: { id: string; email: string } } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,19 +26,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAuthenticated(true);
       setIsAdmin(true);
       // Set mock user and session data for admin/admin auth
-      const mockUser = { id: 'admin-user-id' };
+      const mockUser = { id: 'admin-user-id', email: 'admin@example.com' };
       setUser(mockUser);
       setSession({ user: mockUser });
     }
   }, []);
 
   const login = async (username: string, password: string) => {
-    // Simple authentication logic
+    // Simple authentication logic for demo
     if (username === 'admin' && password === 'admin') {
+      const mockUser = { id: 'admin-user-id', email: 'admin@example.com' };
       setIsAuthenticated(true);
       setIsAdmin(true);
-      // Set mock user and session data
-      const mockUser = { id: 'admin-user-id' };
       setUser(mockUser);
       setSession({ user: mockUser });
       localStorage.setItem('isAuthenticated', 'true');
