@@ -21,13 +21,24 @@ export const useReceipts = () => {
       .from('profiles')
       .select('organization_id, is_admin')
       .eq('id', session.user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError) {
       console.error('Error loading profile:', profileError);
       toast({
         title: 'Error loading profile',
         description: profileError.message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // If no profile found, show a message and return
+    if (!profileData) {
+      console.error('No profile found for user');
+      toast({
+        title: 'Profile not found',
+        description: 'Your user profile could not be found. Please contact support.',
         variant: 'destructive',
       });
       return;
