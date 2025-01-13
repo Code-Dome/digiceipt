@@ -40,6 +40,14 @@ function App() {
                 }
               />
               <Route
+                path="/view"
+                element={
+                  <ProtectedRoute>
+                    <View />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/view/:id"
                 element={
                   <ProtectedRoute>
