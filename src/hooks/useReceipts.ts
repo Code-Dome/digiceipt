@@ -16,10 +16,34 @@ export const useReceipts = () => {
   const loadReceipts = useCallback(async () => {
     if (!session?.user?.id) return;
 
-    const { data, error } = await supabase
+    // First get the user's profile to check organization
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('organization_id, is_admin')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profileError) {
+      console.error('Error loading profile:', profileError);
+      toast({
+        title: 'Error loading profile',
+        description: profileError.message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    let query = supabase
       .from('receipts')
       .select('*')
       .order('created_at', { ascending: false });
+
+    // If user is not admin, filter by their organization
+    if (!profileData.is_admin && profileData.organization_id) {
+      query = query.eq('organization_id', profileData.organization_id);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error loading receipts:', error);
