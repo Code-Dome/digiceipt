@@ -13,8 +13,28 @@ export interface Company {
 export const useCompanyManagement = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const { toast } = useToast();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // First check if user is admin from profiles table
+  const checkAdminStatus = async () => {
+    if (!user) return false;
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+    
+    if (error) {
+      console.error('Error checking admin status:', error);
+      return false;
+    }
+    
+    setIsAdmin(data?.is_admin || false);
+    return data?.is_admin || false;
+  };
 
   const fetchCompanies = async () => {
     try {
@@ -23,12 +43,13 @@ export const useCompanyManagement = () => {
         return;
       }
 
+      const adminStatus = await checkAdminStatus();
+      
       let query = supabase
         .from('companies')
         .select('id, name');
 
-      // If user is admin, get all companies, otherwise only get their own
-      if (!isAdmin) {
+      if (!adminStatus) {
         query = query.eq('user_id', user.id);
       }
 
@@ -52,7 +73,7 @@ export const useCompanyManagement = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      fetchCompanies();
+      checkAdminStatus().then(() => fetchCompanies());
     } else if (!isAuthenticated) {
       navigate('/login');
     }
@@ -111,8 +132,8 @@ export const useCompanyManagement = () => {
       const { error } = await supabase
         .from('companies')
         .delete()
-        .eq('id', id)
-        .eq('user_id', user.id); // Ensure we can only delete our own companies
+        .eq('id', id);
+        // Removed .eq('user_id', user.id) since RLS will handle this
 
       if (error) {
         console.error('Error removing company:', error);
@@ -138,5 +159,6 @@ export const useCompanyManagement = () => {
     companies,
     addCompany,
     removeCompany,
+    isAdmin
   };
 };
