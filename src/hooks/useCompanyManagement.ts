@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export interface Company {
   id: string;
@@ -11,16 +13,27 @@ export interface Company {
 export const useCompanyManagement = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    
     if (user) {
       fetchCompanies();
     }
-  }, [user]);
+  }, [user, isAuthenticated, navigate]);
 
   const fetchCompanies = async () => {
     try {
+      if (!user) {
+        console.error('No authenticated user found');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('companies')
         .select('id, name')
@@ -44,9 +57,19 @@ export const useCompanyManagement = () => {
 
   const addCompany = async (name: string) => {
     try {
+      if (!user) {
+        console.error('No authenticated user found');
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to add a company",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('companies')
-        .insert([{ name, user_id: user?.id }])
+        .insert([{ name, user_id: user.id }])
         .select()
         .single();
 
@@ -72,10 +95,21 @@ export const useCompanyManagement = () => {
 
   const removeCompany = async (id: string) => {
     try {
+      if (!user) {
+        console.error('No authenticated user found');
+        toast({
+          title: "Authentication Error",
+          description: "You must be logged in to remove a company",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('companies')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id); // Ensure we can only delete our own companies
 
       if (error) {
         console.error('Error removing company:', error);
