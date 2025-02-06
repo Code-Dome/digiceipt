@@ -12,12 +12,11 @@ export interface Company {
 
 export const useCompanyManagement = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  // First check if user is admin from profiles table
   const checkAdminStatus = async () => {
     if (!user) return false;
     
@@ -32,7 +31,6 @@ export const useCompanyManagement = () => {
       return false;
     }
     
-    setIsAdmin(data?.is_admin || false);
     return data?.is_admin || false;
   };
 
@@ -44,6 +42,7 @@ export const useCompanyManagement = () => {
       }
 
       const adminStatus = await checkAdminStatus();
+      setIsAdmin(adminStatus);
       
       let query = supabase
         .from('companies')
@@ -72,11 +71,21 @@ export const useCompanyManagement = () => {
   };
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      checkAdminStatus().then(() => fetchCompanies());
-    } else if (!isAuthenticated) {
-      navigate('/login');
-    }
+    let isMounted = true;
+
+    const initializeData = async () => {
+      if (isAuthenticated && user) {
+        await fetchCompanies();
+      } else if (!isAuthenticated) {
+        navigate('/login');
+      }
+    };
+
+    initializeData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [isAuthenticated, user, navigate]);
 
   const addCompany = async (name: string) => {
@@ -133,7 +142,6 @@ export const useCompanyManagement = () => {
         .from('companies')
         .delete()
         .eq('id', id);
-        // Removed .eq('user_id', user.id) since RLS will handle this
 
       if (error) {
         console.error('Error removing company:', error);
