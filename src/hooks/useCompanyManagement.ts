@@ -13,7 +13,7 @@ export interface Company {
 export const useCompanyManagement = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const { toast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const fetchCompanies = async () => {
@@ -23,10 +23,16 @@ export const useCompanyManagement = () => {
         return;
       }
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('companies')
-        .select('id, name')
-        .order('name');
+        .select('id, name');
+
+      // If user is admin, get all companies, otherwise only get their own
+      if (!isAdmin) {
+        query = query.eq('user_id', user.id);
+      }
+
+      const { data, error } = await query.order('name');
 
       if (error) {
         console.error('Error fetching companies:', error);
@@ -45,7 +51,6 @@ export const useCompanyManagement = () => {
   };
 
   useEffect(() => {
-    // Moving authentication check here so it doesn't cause hook execution order issues
     if (isAuthenticated && user) {
       fetchCompanies();
     } else if (!isAuthenticated) {
