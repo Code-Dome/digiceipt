@@ -16,17 +16,6 @@ export const useCompanyManagement = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-    
-    if (user) {
-      fetchCompanies();
-    }
-  }, [user, isAuthenticated, navigate]);
-
   const fetchCompanies = async () => {
     try {
       if (!user) {
@@ -54,6 +43,15 @@ export const useCompanyManagement = () => {
       console.error('Error in fetchCompanies:', error);
     }
   };
+
+  useEffect(() => {
+    // Moving authentication check here so it doesn't cause hook execution order issues
+    if (isAuthenticated && user) {
+      fetchCompanies();
+    } else if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const addCompany = async (name: string) => {
     try {
