@@ -14,7 +14,10 @@ export const useReceipts = () => {
   const { session } = useAuth();
 
   const loadReceipts = useCallback(async () => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      console.log('No authenticated user found');
+      return;
+    }
 
     try {
       // First get the user's profile to check organization
