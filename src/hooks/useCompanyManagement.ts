@@ -61,14 +61,16 @@ export const useCompanyManagement = () => {
   };
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      fetchCompanies();
-    } else if (!isAuthenticated) {
+    if (!isAuthenticated) {
       navigate('/login');
+      return;
+    }
+    
+    if (user) {
+      fetchCompanies();
     }
 
     return () => {
-      // Cleanup function
       setCompanies([]);
     };
   }, [isAuthenticated, user, navigate]);
@@ -101,7 +103,7 @@ export const useCompanyManagement = () => {
         return;
       }
 
-      setCompanies([...companies, data]);
+      setCompanies(prevCompanies => [...prevCompanies, data]);
       toast({
         title: "Company added",
         description: `${name} has been added to the list.`,
@@ -138,7 +140,7 @@ export const useCompanyManagement = () => {
         return;
       }
 
-      setCompanies(companies.filter(company => company.id !== id));
+      setCompanies(prevCompanies => prevCompanies.filter(company => company.id !== id));
       toast({
         title: "Company removed",
         description: "Company has been removed from the list.",
