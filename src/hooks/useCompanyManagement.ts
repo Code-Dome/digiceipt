@@ -12,27 +12,10 @@ export interface Company {
 
 export const useCompanyManagement = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  const checkAdminStatus = async () => {
-    if (!user) return false;
-    
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-    
-    if (error) {
-      console.error('Error checking admin status:', error);
-      return false;
-    }
-    
-    return data?.is_admin || false;
-  };
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchCompanies = async () => {
     try {
@@ -41,18 +24,25 @@ export const useCompanyManagement = () => {
         return;
       }
 
-      const adminStatus = await checkAdminStatus();
-      setIsAdmin(adminStatus);
-      
-      let query = supabase
-        .from('companies')
-        .select('id, name');
+      // First check if user is admin
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
 
-      if (!adminStatus) {
-        query = query.eq('user_id', user.id);
+      if (profileError) {
+        console.error('Error checking admin status:', profileError);
+        return;
       }
 
-      const { data, error } = await query.order('name');
+      setIsAdmin(profileData?.is_admin || false);
+
+      // Fetch companies - RLS policies will handle the filtering
+      const { data, error } = await supabase
+        .from('companies')
+        .select('id, name')
+        .order('name');
 
       if (error) {
         console.error('Error fetching companies:', error);
@@ -71,20 +61,15 @@ export const useCompanyManagement = () => {
   };
 
   useEffect(() => {
-    let isMounted = true;
-
-    const initializeData = async () => {
-      if (isAuthenticated && user) {
-        await fetchCompanies();
-      } else if (!isAuthenticated) {
-        navigate('/login');
-      }
-    };
-
-    initializeData();
+    if (isAuthenticated && user) {
+      fetchCompanies();
+    } else if (!isAuthenticated) {
+      navigate('/login');
+    }
 
     return () => {
-      isMounted = false;
+      // Cleanup function
+      setCompanies([]);
     };
   }, [isAuthenticated, user, navigate]);
 
